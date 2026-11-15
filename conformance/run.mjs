@@ -5,7 +5,7 @@ import { once } from "node:events";
 
 const root = new URL("..", import.meta.url).pathname;
 const LANGS = {
-  typescript: { cwd: "typescript", build: ["npx", "tsc", "-p", "."], test: ["node", "--test", "test/"] },
+  typescript: { cwd: "typescript", build: ["npx", "tsc", "-p", "."], test: ["node", "--test", "test/conformance.test.mjs"] },
   python: { cwd: "python", build: null, test: ["uv", "run", "--quiet", "pytest", "-q", "tests/test_conformance.py"] },
   rust: { cwd: "rust", build: null, test: ["cargo", "test", "--quiet"] },
 };
