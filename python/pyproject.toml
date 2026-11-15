@@ -44,3 +44,7 @@ line-length = 120
 select = ["E", "F", "I", "UP", "B"]
 # One-line exception classes read best as one line.
 ignore = ["E701"]
+
+[tool.ruff.lint.per-file-ignores]
+# Generated from the API spec. Its comments repeat the API descriptions, which can be long.
+"src/frontmost/_generated.py" = ["E501"]
