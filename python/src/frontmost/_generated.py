@@ -22,6 +22,10 @@ class CreditsAutoTopup(TypedDict):
     """Change it on the Billing page"""
 
     enabled: bool
+    # When remaining falls below this, auto top-up buys credits. Null until a person sets it
+    threshold_credits: Optional[int]
+    # Auto top-up buys packs of 1,000 until remaining is back at this. Null until a person sets it
+    refill_to_credits: Optional[int]
     monthly_limit_usd: str
     spent_this_cycle_usd: str
 

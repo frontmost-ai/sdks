@@ -27,6 +27,10 @@ pub struct CreditsStep {
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct CreditsAutoTopup {
     pub enabled: bool,
+    /// When remaining falls below this, auto top-up buys credits. Null until a person sets it
+    pub threshold_credits: Option<i64>,
+    /// Auto top-up buys packs of 1,000 until remaining is back at this. Null until a person sets it
+    pub refill_to_credits: Option<i64>,
     pub monthly_limit_usd: String,
     pub spent_this_cycle_usd: String,
 }

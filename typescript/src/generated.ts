@@ -27,6 +27,10 @@ export type Credits = {
   /** Change it on the Billing page */
   auto_topup: {
     enabled: boolean;
+    /** When remaining falls below this, auto top-up buys credits. Null until a person sets it */
+    threshold_credits: number | null;
+    /** Auto top-up buys packs of 1,000 until remaining is back at this. Null until a person sets it */
+    refill_to_credits: number | null;
     monthly_limit_usd: string;
     spent_this_cycle_usd: string;
   };
