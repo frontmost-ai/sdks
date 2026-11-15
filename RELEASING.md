@@ -17,7 +17,7 @@ Each publish job skips a version that is already on its registry. A failed job c
 
 Do this for a break that Ian signed off, or for a change to a hand-written `core` file.
 
-1. Run `node scripts/bump.mjs minor`. Use `major` after 1.0.0.
+1. Run `node scripts/bump.mjs major` for a break. Before 1.0.0, it bumps the minor number (0.1.x to 0.2.0).
 2. Commit the change to `main`.
 3. Run `git tag vX.Y.Z` with the version that the script printed.
 4. Run `git push origin main vX.Y.Z`.

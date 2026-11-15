@@ -8,6 +8,45 @@ from typing_extensions import NotRequired, TypedDict, Unpack
 
 from ._core import AsyncCore, AsyncPage, AsyncResource, RequestOptions, SyncCore, SyncPage, SyncResource
 
+CreditStatus = Literal["ok", "low", "out"]
+
+
+class CreditsStep(TypedDict):
+    code: str
+    credits: int
+    monthly_usd: str
+    annual_usd: Optional[str]
+
+
+class CreditsAutoTopup(TypedDict):
+    """Change it on the Billing page"""
+
+    enabled: bool
+    monthly_limit_usd: str
+    spent_this_cycle_usd: str
+
+
+class Credits(TypedDict):
+    """The workspace's credits"""
+
+    step: CreditsStep
+    # Credits left now: the monthly credits and top-ups, less what running work holds
+    remaining: int
+    # The part of `remaining` that ends at `cycle_resets_at`
+    monthly_remaining: int
+    # The part of `remaining` from top-ups, which last 12 months
+    topup_remaining: int
+    cycle_resets_at: Optional[str]
+    # Credits used this cycle plus what the project schedules use before the reset
+    projected_monthly_use: int
+    # Credits Ask used in the last 30 days. Not in `projected_monthly_use`
+    ask_last_30_days: int
+    # low: 80% of this cycle's credits are used. out: fewer than 10 left, so no scan can start
+    status: CreditStatus
+    # Change it on the Billing page
+    auto_topup: CreditsAutoTopup
+
+
 KeyKind = Literal["read", "full"]
 
 
@@ -16,7 +55,6 @@ ScanCadence = Literal["daily", "weekly", "mwf"]
 
 class WorkspaceQuestions(TypedDict):
     used: int
-    max: int
 
 
 class WorkspaceProjects(TypedDict):
@@ -40,6 +78,11 @@ class Workspace(TypedDict):
     apps: list[str]
     scanning: bool
     scan_cadence: ScanCadence
+    # Null for a person who sees only some of the workspace's projects
+    credits: Optional[Credits]
+
+
+ProjectCadence = Literal["daily", "mwf", "weekly", "off"]
 
 
 class Project(TypedDict):
@@ -49,6 +92,10 @@ class Project(TypedDict):
     domain: Optional[str]
     apps: list[str]
     scanning: bool
+    # How often the project's scans run. mwf is Monday, Wednesday, and Friday
+    cadence: ProjectCadence
+    # Whether the project gets a brief each Monday
+    weekly_brief: bool
     created_at: Optional[str]
     url: str
 
@@ -419,8 +466,14 @@ class ProjectsCreateBody(TypedDict):
 class ProjectsUpdateBody(TypedDict):
     # A new name for the project
     name: NotRequired[str]
-    # Start or stop the scans
+    # Start daily scans, or stop the scans. cadence wins when both are sent
     scanning: NotRequired[bool]
+    # The AI apps the scans ask, such as chatgpt and claude
+    apps: NotRequired[list[str]]
+    # How often the scans run. mwf is Monday, Wednesday, and Friday
+    cadence: NotRequired[ProjectCadence]
+    # Turn the Monday brief on or off
+    weekly_brief: NotRequired[bool]
 
 
 class QuestionsCreateBodyQuestionsItem(TypedDict):
@@ -503,7 +556,7 @@ class ProjectsResource(SyncResource):
         return cast(Project, self._core.request("GET", f"/projects/{quote(id, safe='')}", options=options))
 
     def update(self, id: str, body: ProjectsUpdateBody, **options: Unpack[RequestOptions]) -> Project:
-        """Rename a project, or start or stop its scans `PATCH /projects/{id}`"""
+        """Rename a project, or change its AI apps, cadence, or weekly brief `PATCH /projects/{id}`"""
         return cast(Project, self._core.request("PATCH", f"/projects/{quote(id, safe='')}", body=body, options=options))
 
 
@@ -848,7 +901,7 @@ class AsyncProjectsResource(AsyncResource):
         return cast(Project, await self._core.request("GET", f"/projects/{quote(id, safe='')}", options=options))
 
     async def update(self, id: str, body: ProjectsUpdateBody, **options: Unpack[RequestOptions]) -> Project:
-        """Rename a project, or start or stop its scans `PATCH /projects/{id}`"""
+        """Rename a project, or change its AI apps, cadence, or weekly brief `PATCH /projects/{id}`"""
         return cast(
             Project, await self._core.request("PATCH", f"/projects/{quote(id, safe='')}", body=body, options=options)
         )
@@ -1250,12 +1303,17 @@ class AsyncFrontmost(AsyncCore):
 
 
 __all__ = [
+    "CreditStatus",
+    "CreditsStep",
+    "CreditsAutoTopup",
+    "Credits",
     "KeyKind",
     "ScanCadence",
     "WorkspaceQuestions",
     "WorkspaceProjects",
     "WorkspaceProfiles",
     "Workspace",
+    "ProjectCadence",
     "Project",
     "Question",
     "ProjectList",

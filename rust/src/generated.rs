@@ -6,6 +6,54 @@ use crate::core::{encode, to_json, Client, Error, Page, RequestOptions};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+pub enum CreditStatus {
+    Ok,
+    Low,
+    Out,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct CreditsStep {
+    pub code: String,
+    pub credits: i64,
+    pub monthly_usd: String,
+    pub annual_usd: Option<String>,
+}
+
+/// Change it on the Billing page
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct CreditsAutoTopup {
+    pub enabled: bool,
+    pub monthly_limit_usd: String,
+    pub spent_this_cycle_usd: String,
+}
+
+/// The workspace's credits
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Credits {
+    pub step: CreditsStep,
+    /// Credits left now: the monthly credits and top-ups, less what running work holds
+    pub remaining: i64,
+    /// The part of `remaining` that ends at `cycle_resets_at`
+    pub monthly_remaining: i64,
+    /// The part of `remaining` from top-ups, which last 12 months
+    pub topup_remaining: i64,
+    pub cycle_resets_at: Option<String>,
+    /// Credits used this cycle plus what the project schedules use before the reset
+    pub projected_monthly_use: i64,
+    /// Credits Ask used in the last 30 days. Not in `projected_monthly_use`
+    pub ask_last_30_days: i64,
+    /// low: 80% of this cycle's credits are used. out: fewer than 10 left, so no scan can start
+    pub status: CreditStatus,
+    /// Change it on the Billing page
+    pub auto_topup: CreditsAutoTopup,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum KeyKind {
     Read,
     Full,
@@ -28,7 +76,6 @@ pub enum ScanCadence {
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct WorkspaceQuestions {
     pub used: i64,
-    pub max: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -55,9 +102,23 @@ pub struct Workspace {
     pub apps: Vec<String>,
     pub scanning: bool,
     pub scan_cadence: ScanCadence,
+    /// Null for a person who sees only some of the workspace's projects
+    pub credits: Option<Credits>,
 }
 
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ProjectCadence {
+    Daily,
+    Mwf,
+    Weekly,
+    Off,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Project {
     pub object: String,
     pub id: String,
@@ -65,6 +126,10 @@ pub struct Project {
     pub domain: Option<String>,
     pub apps: Vec<String>,
     pub scanning: bool,
+    /// How often the project's scans run. mwf is Monday, Wednesday, and Friday
+    pub cadence: ProjectCadence,
+    /// Whether the project gets a brief each Monday
+    pub weekly_brief: bool,
     pub created_at: Option<String>,
     pub url: String,
 }
@@ -553,9 +618,18 @@ pub struct ProjectsUpdateBody {
     /// A new name for the project
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    /// Start or stop the scans
+    /// Start daily scans, or stop the scans. cadence wins when both are sent
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub scanning: Option<bool>,
+    /// The AI apps the scans ask, such as chatgpt and claude
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub apps: Option<Vec<String>>,
+    /// How often the scans run. mwf is Monday, Wednesday, and Friday
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cadence: Option<ProjectCadence>,
+    /// Turn the Monday brief on or off
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weekly_brief: Option<bool>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -852,7 +926,7 @@ impl ProjectsResource<'_> {
             .await
     }
 
-    /// Rename a project, or start or stop its scans `PATCH /projects/{id}`
+    /// Rename a project, or change its AI apps, cadence, or weekly brief `PATCH /projects/{id}`
     pub async fn update(
         &self,
         id: &str,
