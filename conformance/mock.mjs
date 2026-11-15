@@ -11,7 +11,7 @@ const workspace = {
     step: { code: "starter", credits: 1000, monthly_usd: "19.00", annual_usd: "180.00" },
     remaining: 820, monthly_remaining: 820, topup_remaining: 0, cycle_resets_at: "2026-12-01T05:00:00.000Z",
     projected_monthly_use: 930, ask_last_30_days: 4, status: "ok",
-    auto_topup: { enabled: false, monthly_limit_usd: "20.00", spent_this_cycle_usd: "0.00" },
+    auto_topup: { enabled: false, threshold_credits: null, refill_to_credits: null, monthly_limit_usd: "20.00", spent_this_cycle_usd: "0.00" },
   },
 };
 const question = (id, text) => ({ object: "question", id, text, topic: "Business", active: true, is_branded: false, profile_id: null });
