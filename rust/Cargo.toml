@@ -1,0 +1,27 @@
+[package]
+name = "frontmost-ai"
+version = "0.1.0"
+edition = "2021"
+description = "See when ChatGPT and other AI apps recommend your business, from your own code and agents."
+license = "MIT"
+readme = "README.md"
+homepage = "https://frontmost.ai"
+repository = "https://github.com/frontmost-ai/sdks"
+documentation = "https://docs.rs/frontmost-ai"
+keywords = ["frontmost", "ai-visibility", "aeo", "chatgpt", "sdk"]
+categories = ["api-bindings", "web-programming::http-client"]
+
+[lib]
+name = "frontmost_ai"
+
+[dependencies]
+futures = { version = "0.3", default-features = false, features = ["std"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["time"] }
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt"] }

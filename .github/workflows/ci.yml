@@ -1,0 +1,95 @@
+# Every push and pull request: the generated files match the spec, each SDK passes its linters,
+# and each SDK passes the shared conformance cases against the mock API.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  generated:
+    name: Generated files and README examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: astral-sh/setup-uv@v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+      - run: npm ci
+        working-directory: typescript
+      - name: Regenerate from spec/openapi.json
+        run: node codegen/generate.mjs
+      - name: Fail on any difference
+        run: git diff --exit-code -- typescript/src python/src rust/src
+      - name: Type-check the README examples
+        run: node scripts/check-readmes.mjs
+
+  typescript:
+    name: TypeScript (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm ci
+        working-directory: typescript
+      - run: node conformance/run.mjs typescript
+
+  python:
+    name: Python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.13"]
+    env:
+      UV_PYTHON: ${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+        working-directory: python
+      - run: uvx ruff@0.17.5 check .
+        working-directory: python
+      - run: uvx ruff@0.17.5 format --check .
+        working-directory: python
+      - run: uv run mypy src tests examples
+        working-directory: python
+      - run: node conformance/run.mjs python
+
+  rust:
+    name: Rust
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+      - run: cargo fmt --check
+        working-directory: rust
+      - run: cargo clippy --all-targets -- -D warnings
+        working-directory: rust
+      - run: node conformance/run.mjs rust

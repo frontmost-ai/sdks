@@ -1,0 +1,194 @@
+# Keeps the SDKs in step with the live API, then publishes them.
+#
+# Every hour, `sync` reads https://app.frontmost.ai/api/v1/openapi.json.
+#   - Same as spec/openapi.json: nothing happens.
+#   - A break: the job opens an issue and stops. A break needs Ian's sign-off and a manual release.
+#   - Any other change: the job regenerates the SDKs, runs every check, bumps the version,
+#     pushes the commit and a tag to main, and the publish jobs release it.
+# A tag that a person pushes (v1.2.3) also publishes, with no sync.
+#
+# npm, PyPI, and crates.io trust this file through OIDC, so the repository holds no registry token.
+# RELEASING.md lists the one-time registry setup.
+name: Release
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    outputs:
+      tag: ${{ steps.release.outputs.tag }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: astral-sh/setup-uv@v6
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Read the live spec
+        id: live
+        run: |
+          curl -fsS --retry 3 https://app.frontmost.ai/api/v1/openapi.json -o "$RUNNER_TEMP/live.json"
+          if node scripts/same-json.mjs spec/openapi.json "$RUNNER_TEMP/live.json"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "The live spec matches spec/openapi.json."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Name the change
+        if: steps.live.outputs.changed == 'true'
+        id: diff
+        run: |
+          set +e
+          node codegen/breaking.mjs spec/openapi.json "$RUNNER_TEMP/live.json" | tee "$RUNNER_TEMP/diff.txt"
+          status=${PIPESTATUS[0]}
+          set -e
+          bump=$(grep -oE 'bump: (major|minor|none)' "$RUNNER_TEMP/diff.txt" | cut -d' ' -f2)
+          echo "bump=$bump" >> "$GITHUB_OUTPUT"
+          if [ "$status" != 0 ]; then
+            title="The live API has a breaking change"
+            if [ -z "$(gh issue list --state open --search "in:title \"$title\"" --json number --jq '.[].number')" ]; then
+              gh issue create --title "$title" --body-file "$RUNNER_TEMP/diff.txt"
+            fi
+            echo "::error::A breaking change needs Ian's sign-off and a manual release."
+            exit 1
+          fi
+
+      - name: Regenerate and run every check
+        if: steps.live.outputs.changed == 'true'
+        run: |
+          (cd typescript && npm ci)
+          node codegen/sync.mjs "$RUNNER_TEMP/live.json" --write
+          node scripts/check-readmes.mjs
+
+      - name: Bump, commit, and tag
+        if: steps.live.outputs.changed == 'true'
+        id: release
+        run: |
+          level=${{ steps.diff.outputs.bump }}
+          [ "$level" = none ] && level=patch
+          version=$(node scripts/bump.mjs "$level")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A spec typescript/src typescript/package.json python rust
+          git commit -m "Sync with the live API: v$version" -m "$(cat "$RUNNER_TEMP/diff.txt")"
+          git tag "v$version"
+          git push origin HEAD:main "v$version"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+  npm:
+    needs: sync
+    if: always() && (github.event_name == 'push' || needs.sync.outputs.tag != '')
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref || needs.sync.outputs.tag }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or later.
+      - run: npm install -g npm@latest
+      - name: Publish @frontmost-ai/sdk
+        working-directory: typescript
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          if npm view "@frontmost-ai/sdk@$version" version >/dev/null 2>&1; then
+            echo "@frontmost-ai/sdk@$version is already on npm."
+            exit 0
+          fi
+          npm ci
+          npm publish
+
+  pypi:
+    needs: sync
+    if: always() && (github.event_name == 'push' || needs.sync.outputs.tag != '')
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref || needs.sync.outputs.tag }}
+      - uses: astral-sh/setup-uv@v6
+      - run: uv build --out-dir dist
+        working-directory: python
+      - name: Publish frontmost
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist
+          skip-existing: true
+
+  crates:
+    needs: sync
+    if: always() && (github.event_name == 'push' || needs.sync.outputs.tag != '')
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref || needs.sync.outputs.tag }}
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - name: Publish frontmost-ai
+        working-directory: rust
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).packages[0].version))')
+          if curl -fsS -A "frontmost-ai/sdks release" "https://crates.io/api/v1/crates/frontmost-ai/$version" >/dev/null 2>&1; then
+            echo "frontmost-ai $version is already on crates.io."
+            exit 0
+          fi
+          cargo publish
+
+  github:
+    needs: [sync, npm, pypi, crates]
+    if: always() && (github.event_name == 'push' || needs.sync.outputs.tag != '') && needs.npm.result == 'success' && needs.pypi.result == 'success' && needs.crates.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create the GitHub release
+        run: |
+          tag=${{ github.event_name == 'push' && github.ref_name || needs.sync.outputs.tag }}
+          gh release view "$tag" >/dev/null 2>&1 || gh release create "$tag" --generate-notes --title "$tag"

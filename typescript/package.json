@@ -1,0 +1,23 @@
+{
+  "name": "@frontmost-ai/sdk",
+  "version": "0.1.0",
+  "description": "See when ChatGPT and other AI apps recommend your business, from your own code and agents.",
+  "keywords": ["frontmost", "ai visibility", "aeo", "geo", "chatgpt", "ai search", "sdk"],
+  "homepage": "https://github.com/frontmost-ai/sdks/tree/main/typescript#readme",
+  "repository": { "type": "git", "url": "git+https://github.com/frontmost-ai/sdks.git", "directory": "typescript" },
+  "bugs": "https://github.com/frontmost-ai/sdks/issues",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "sideEffects": false,
+  "engines": { "node": ">=20" },
+  "scripts": { "build": "tsc -p .", "test": "node --test test/", "prepublishOnly": "tsc -p ." },
+  "publishConfig": { "access": "public", "provenance": true },
+  "devDependencies": { "typescript": "^5.9.3", "@types/node": "^22.10.0" }
+}
