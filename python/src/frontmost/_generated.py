@@ -85,16 +85,68 @@ class Workspace(TypedDict):
 ProjectCadence = Literal["daily", "mwf", "weekly", "off"]
 
 
+class RunConfigChange(TypedDict):
+    """The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true"""
+
+    # The AI apps each scan asks, such as chatgpt and gemini
+    apps: NotRequired[list[str]]
+    # How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday
+    cadence: NotRequired[ProjectCadence]
+    # Write a brief after each Monday scan
+    weekly_brief: NotRequired[bool]
+
+
+class RunCostRatesItem(TypedDict):
+    app: str
+    credits_per_answer: int
+
+
+class RunCost(TypedDict):
+    """The credits the run config uses. Every number in monthly_max is here"""
+
+    # The credits one answer uses in each AI app, at today's rate
+    rates: list[RunCostRatesItem]
+    # The fewest credits a scan uses
+    minimum_per_scan: int
+    # max(active_questions × the sum of the rates, minimum_per_scan)
+    per_scan: int
+    # Scans in the longest month: daily 31, mwf 14, weekly 5, off 0
+    scans_per_month: int
+    # Credits for one weekly brief
+    per_brief: int
+    # Briefs in the longest month: 5 Mondays when weekly_brief is on and the scans run, else 0
+    briefs_per_month: int
+    # per_scan × scans_per_month + per_brief × briefs_per_month. The most credits a calendar month uses. Ask is billed per message and is not in it
+    monthly_max: int
+
+
+class RunConfig(TypedDict):
+    """What the project's scans ask, how often they run, and the credits that uses. Change it with PATCH /projects/{id}"""
+
+    # The AI apps each scan asks
+    apps: list[str]
+    # How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday
+    cadence: ProjectCadence
+    # Whether a brief is written after each Monday scan
+    weekly_brief: bool
+    # Questions each scan asks. Change them with the questions routes
+    active_questions: int
+    cost: RunCost
+
+
 class Project(TypedDict):
     object: Literal["project"]
     id: str
     name: str
     domain: Optional[str]
+    run_config: RunConfig
+    # Older field. The same as run_config.apps
     apps: list[str]
+    # Older field. True when run_config.cadence is not off
     scanning: bool
-    # How often the project's scans run. mwf is Monday, Wednesday, and Friday
+    # Older field. The same as run_config.cadence
     cadence: ProjectCadence
-    # Whether the project gets a brief each Monday
+    # Older field. The same as run_config.weekly_brief
     weekly_brief: bool
     created_at: Optional[str]
     url: str
@@ -139,6 +191,8 @@ class Scan(TypedDict):
 
 class ProjectSetupNextBody(TypedDict):
     setup_id: str
+    # The run_config you sent. Nothing keeps it between calls
+    run_config: NotRequired[RunConfigChange]
 
 
 class ProjectSetupNext(TypedDict):
@@ -450,6 +504,17 @@ class ProjectsCreateBodyQuestionsItem(TypedDict):
     topic: NotRequired[str]
 
 
+class ProjectsCreateBodyRunConfig(TypedDict):
+    """The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true"""
+
+    # The AI apps each scan asks, such as chatgpt and gemini
+    apps: NotRequired[list[str]]
+    # How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday
+    cadence: NotRequired[ProjectCadence]
+    # Write a brief after each Monday scan
+    weekly_brief: NotRequired[bool]
+
+
 class ProjectsCreateBody(TypedDict):
     # The website to track, such as example.com
     domain: NotRequired[str]
@@ -461,18 +526,33 @@ class ProjectsCreateBody(TypedDict):
     language: NotRequired[str]
     # Your own first questions, in place of the ones Frontmost AI writes
     questions: NotRequired[list[ProjectsCreateBodyQuestionsItem]]
+    # The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true
+    run_config: NotRequired[ProjectsCreateBodyRunConfig]
+
+
+class ProjectsUpdateBodyRunConfig(TypedDict):
+    """The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true"""
+
+    # The AI apps each scan asks, such as chatgpt and gemini
+    apps: NotRequired[list[str]]
+    # How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday
+    cadence: NotRequired[ProjectCadence]
+    # Write a brief after each Monday scan
+    weekly_brief: NotRequired[bool]
 
 
 class ProjectsUpdateBody(TypedDict):
     # A new name for the project
     name: NotRequired[str]
-    # Start daily scans, or stop the scans. cadence wins when both are sent
+    # The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true
+    run_config: NotRequired[ProjectsUpdateBodyRunConfig]
+    # Older field. Use run_config.cadence. true is daily, false is off
     scanning: NotRequired[bool]
-    # The AI apps the scans ask, such as chatgpt and claude
+    # Older field. Use run_config.apps
     apps: NotRequired[list[str]]
-    # How often the scans run. mwf is Monday, Wednesday, and Friday
+    # Older field. Use run_config.cadence. It wins over scanning
     cadence: NotRequired[ProjectCadence]
-    # Turn the Monday brief on or off
+    # Older field. Use run_config.weekly_brief
     weekly_brief: NotRequired[bool]
 
 
@@ -556,7 +636,7 @@ class ProjectsResource(SyncResource):
         return cast(Project, self._core.request("GET", f"/projects/{quote(id, safe='')}", options=options))
 
     def update(self, id: str, body: ProjectsUpdateBody, **options: Unpack[RequestOptions]) -> Project:
-        """Rename a project, or change its AI apps, cadence, or weekly brief `PATCH /projects/{id}`"""
+        """Rename a project, or change its run config `PATCH /projects/{id}`"""
         return cast(Project, self._core.request("PATCH", f"/projects/{quote(id, safe='')}", body=body, options=options))
 
 
@@ -901,7 +981,7 @@ class AsyncProjectsResource(AsyncResource):
         return cast(Project, await self._core.request("GET", f"/projects/{quote(id, safe='')}", options=options))
 
     async def update(self, id: str, body: ProjectsUpdateBody, **options: Unpack[RequestOptions]) -> Project:
-        """Rename a project, or change its AI apps, cadence, or weekly brief `PATCH /projects/{id}`"""
+        """Rename a project, or change its run config `PATCH /projects/{id}`"""
         return cast(
             Project, await self._core.request("PATCH", f"/projects/{quote(id, safe='')}", body=body, options=options)
         )
@@ -1314,6 +1394,10 @@ __all__ = [
     "WorkspaceProfiles",
     "Workspace",
     "ProjectCadence",
+    "RunConfigChange",
+    "RunCostRatesItem",
+    "RunCost",
+    "RunConfig",
     "Project",
     "Question",
     "ProjectList",
@@ -1356,7 +1440,9 @@ __all__ = [
     "ProfileList",
     "AddedQuestionList",
     "ProjectsCreateBodyQuestionsItem",
+    "ProjectsCreateBodyRunConfig",
     "ProjectsCreateBody",
+    "ProjectsUpdateBodyRunConfig",
     "ProjectsUpdateBody",
     "QuestionsCreateBodyQuestionsItem",
     "QuestionsCreateBody",

@@ -61,16 +61,63 @@ export type Workspace = {
 
 export type ProjectCadence = "daily" | "mwf" | "weekly" | "off";
 
+/** The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true */
+export type RunConfigChange = {
+  /** The AI apps each scan asks, such as chatgpt and gemini */
+  apps?: Array<string>;
+  /** How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday */
+  cadence?: ProjectCadence;
+  /** Write a brief after each Monday scan */
+  weekly_brief?: boolean;
+};
+
+/** The credits the run config uses. Every number in monthly_max is here */
+export type RunCost = {
+  /** The credits one answer uses in each AI app, at today's rate */
+  rates: Array<{
+    app: string;
+    credits_per_answer: number;
+  }>;
+  /** The fewest credits a scan uses */
+  minimum_per_scan: number;
+  /** max(active_questions × the sum of the rates, minimum_per_scan) */
+  per_scan: number;
+  /** Scans in the longest month: daily 31, mwf 14, weekly 5, off 0 */
+  scans_per_month: number;
+  /** Credits for one weekly brief */
+  per_brief: number;
+  /** Briefs in the longest month: 5 Mondays when weekly_brief is on and the scans run, else 0 */
+  briefs_per_month: number;
+  /** per_scan × scans_per_month + per_brief × briefs_per_month. The most credits a calendar month uses. Ask is billed per message and is not in it */
+  monthly_max: number;
+};
+
+/** What the project's scans ask, how often they run, and the credits that uses. Change it with PATCH /projects/{id} */
+export type RunConfig = {
+  /** The AI apps each scan asks */
+  apps: Array<string>;
+  /** How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday */
+  cadence: ProjectCadence;
+  /** Whether a brief is written after each Monday scan */
+  weekly_brief: boolean;
+  /** Questions each scan asks. Change them with the questions routes */
+  active_questions: number;
+  cost: RunCost;
+};
+
 export type Project = {
   object: "project";
   id: string;
   name: string;
   domain: string | null;
+  run_config: RunConfig;
+  /** Older field. The same as run_config.apps */
   apps: Array<string>;
+  /** Older field. True when run_config.cadence is not off */
   scanning: boolean;
-  /** How often the project's scans run. mwf is Monday, Wednesday, and Friday */
+  /** Older field. The same as run_config.cadence */
   cadence: ProjectCadence;
-  /** Whether the project gets a brief each Monday */
+  /** Older field. The same as run_config.weekly_brief */
   weekly_brief: boolean;
   created_at: string | null;
   url: string;
@@ -125,6 +172,8 @@ export type ProjectSetup = {
     path: string;
     body: {
       setup_id: string;
+      /** The run_config you sent. Nothing keeps it between calls */
+      run_config?: RunConfigChange;
     };
   };
 };
@@ -401,18 +450,36 @@ export type ProjectsCreateBody = {
     /** The topic that groups the question */
     topic?: string;
   }>;
+  /** The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true */
+  run_config?: {
+    /** The AI apps each scan asks, such as chatgpt and gemini */
+    apps?: Array<string>;
+    /** How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday */
+    cadence?: ProjectCadence;
+    /** Write a brief after each Monday scan */
+    weekly_brief?: boolean;
+  };
 };
 
 export type ProjectsUpdateBody = {
   /** A new name for the project */
   name?: string;
-  /** Start daily scans, or stop the scans. cadence wins when both are sent */
+  /** The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true */
+  run_config?: {
+    /** The AI apps each scan asks, such as chatgpt and gemini */
+    apps?: Array<string>;
+    /** How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday */
+    cadence?: ProjectCadence;
+    /** Write a brief after each Monday scan */
+    weekly_brief?: boolean;
+  };
+  /** Older field. Use run_config.cadence. true is daily, false is off */
   scanning?: boolean;
-  /** The AI apps the scans ask, such as chatgpt and claude */
+  /** Older field. Use run_config.apps */
   apps?: Array<string>;
-  /** How often the scans run. mwf is Monday, Wednesday, and Friday */
+  /** Older field. Use run_config.cadence. It wins over scanning */
   cadence?: ProjectCadence;
-  /** Turn the Monday brief on or off */
+  /** Older field. Use run_config.weekly_brief */
   weekly_brief?: boolean;
 };
 
@@ -587,7 +654,7 @@ export class ProjectsResource {
     return this.core.request("GET", `/projects/${encodeURIComponent(id)}`, { options });
   }
 
-  /** Rename a project, or change its AI apps, cadence, or weekly brief `PATCH /projects/{id}` */
+  /** Rename a project, or change its run config `PATCH /projects/{id}` */
   update(id: string, body: ProjectsUpdateBody, options?: RequestOptions): Promise<Project> {
     return this.core.request("PATCH", `/projects/${encodeURIComponent(id)}`, { body, options });
   }

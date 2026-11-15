@@ -118,17 +118,73 @@ pub enum ProjectCadence {
     Unknown,
 }
 
+/// The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct RunConfigChange {
+    /// The AI apps each scan asks, such as chatgpt and gemini
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub apps: Option<Vec<String>>,
+    /// How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cadence: Option<ProjectCadence>,
+    /// Write a brief after each Monday scan
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weekly_brief: Option<bool>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct RunCostRate {
+    pub app: String,
+    pub credits_per_answer: i64,
+}
+
+/// The credits the run config uses. Every number in monthly_max is here
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct RunCost {
+    /// The credits one answer uses in each AI app, at today's rate
+    pub rates: Vec<RunCostRate>,
+    /// The fewest credits a scan uses
+    pub minimum_per_scan: i64,
+    /// max(active_questions × the sum of the rates, minimum_per_scan)
+    pub per_scan: i64,
+    /// Scans in the longest month: daily 31, mwf 14, weekly 5, off 0
+    pub scans_per_month: i64,
+    /// Credits for one weekly brief
+    pub per_brief: i64,
+    /// Briefs in the longest month: 5 Mondays when weekly_brief is on and the scans run, else 0
+    pub briefs_per_month: i64,
+    /// per_scan × scans_per_month + per_brief × briefs_per_month. The most credits a calendar month uses. Ask is billed per message and is not in it
+    pub monthly_max: i64,
+}
+
+/// What the project's scans ask, how often they run, and the credits that uses. Change it with PATCH /projects/{id}
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RunConfig {
+    /// The AI apps each scan asks
+    pub apps: Vec<String>,
+    /// How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday
+    pub cadence: ProjectCadence,
+    /// Whether a brief is written after each Monday scan
+    pub weekly_brief: bool,
+    /// Questions each scan asks. Change them with the questions routes
+    pub active_questions: i64,
+    pub cost: RunCost,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Project {
     pub object: String,
     pub id: String,
     pub name: String,
     pub domain: Option<String>,
+    pub run_config: RunConfig,
+    /// Older field. The same as run_config.apps
     pub apps: Vec<String>,
+    /// Older field. True when run_config.cadence is not off
     pub scanning: bool,
-    /// How often the project's scans run. mwf is Monday, Wednesday, and Friday
+    /// Older field. The same as run_config.cadence
     pub cadence: ProjectCadence,
-    /// Whether the project gets a brief each Monday
+    /// Older field. The same as run_config.weekly_brief
     pub weekly_brief: bool,
     pub created_at: Option<String>,
     pub url: String,
@@ -185,6 +241,9 @@ pub struct Scan {
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ProjectSetupNextBody {
     pub setup_id: String,
+    /// The run_config you sent. Nothing keeps it between calls
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_config: Option<RunConfigChange>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -586,6 +645,20 @@ pub struct ProjectsCreateBodyQuestion {
     pub topic: Option<String>,
 }
 
+/// The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ProjectsCreateBodyRunConfig {
+    /// The AI apps each scan asks, such as chatgpt and gemini
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub apps: Option<Vec<String>>,
+    /// How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cadence: Option<ProjectCadence>,
+    /// Write a brief after each Monday scan
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weekly_brief: Option<bool>,
+}
+
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ProjectsCreateBody {
     /// The website to track, such as example.com
@@ -603,6 +676,9 @@ pub struct ProjectsCreateBody {
     /// Your own first questions, in place of the ones Frontmost AI writes
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub questions: Option<Vec<ProjectsCreateBodyQuestion>>,
+    /// The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_config: Option<ProjectsCreateBodyRunConfig>,
 }
 
 /// The reply of `projects().create()`: the Project, or ProjectSetup while the work runs.
@@ -613,21 +689,38 @@ pub enum ProjectsCreateReply {
     ProjectSetup(ProjectSetup),
 }
 
+/// The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ProjectsUpdateBodyRunConfig {
+    /// The AI apps each scan asks, such as chatgpt and gemini
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub apps: Option<Vec<String>>,
+    /// How often the scans run. mwf is Monday, Wednesday, and Friday. weekly is Monday
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cadence: Option<ProjectCadence>,
+    /// Write a brief after each Monday scan
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub weekly_brief: Option<bool>,
+}
+
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ProjectsUpdateBody {
     /// A new name for the project
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    /// Start daily scans, or stop the scans. cadence wins when both are sent
+    /// The fields to set. A field left out keeps its value. On a new project, it takes the default: the workspace's `apps`, the workspace's `scan_cadence`, and `weekly_brief` true
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub run_config: Option<ProjectsUpdateBodyRunConfig>,
+    /// Older field. Use run_config.cadence. true is daily, false is off
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub scanning: Option<bool>,
-    /// The AI apps the scans ask, such as chatgpt and claude
+    /// Older field. Use run_config.apps
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub apps: Option<Vec<String>>,
-    /// How often the scans run. mwf is Monday, Wednesday, and Friday
+    /// Older field. Use run_config.cadence. It wins over scanning
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cadence: Option<ProjectCadence>,
-    /// Turn the Monday brief on or off
+    /// Older field. Use run_config.weekly_brief
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub weekly_brief: Option<bool>,
 }
@@ -926,7 +1019,7 @@ impl ProjectsResource<'_> {
             .await
     }
 
-    /// Rename a project, or change its AI apps, cadence, or weekly brief `PATCH /projects/{id}`
+    /// Rename a project, or change its run config `PATCH /projects/{id}`
     pub async fn update(
         &self,
         id: &str,
