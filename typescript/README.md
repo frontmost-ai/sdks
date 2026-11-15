@@ -3,10 +3,10 @@
 Find out when ChatGPT and other AI apps recommend your business, and who they recommend instead. This package gives your code and agents typed access to the [Frontmost AI API](https://app.frontmost.ai/api/v1/openapi.json).
 
 ```bash
-npm install https://github.com/frontmost-ai/sdks/releases/download/v0.1.0/frontmost-ai-sdk-0.1.0.tgz
+npm install https://github.com/frontmost-ai/sdks/releases/download/v0.2.0/frontmost-ai-sdk-0.2.0.tgz
 ```
 
-Version 0.1.0 installs from [its GitHub release](https://github.com/frontmost-ai/sdks/releases/tag/v0.1.0). The packages go on npm, PyPI, and crates.io next.
+Version 0.2.0 installs from [its GitHub release](https://github.com/frontmost-ai/sdks/releases/tag/v0.2.0). The packages go on npm, PyPI, and crates.io next.
 
 It runs on Node 20 or later, Bun, and Deno. It has no dependencies.
 
