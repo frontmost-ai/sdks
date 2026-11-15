@@ -3,10 +3,8 @@
 Find out when ChatGPT and other AI apps recommend your business, and who they recommend instead. This package gives your code and agents typed access to the [Frontmost AI API](https://app.frontmost.ai/api/v1/openapi.json).
 
 ```bash
-pip install https://github.com/frontmost-ai/sdks/releases/download/v0.2.1/frontmost-0.2.1-py3-none-any.whl
+pip install frontmost
 ```
-
-Version 0.2.1 installs from [its GitHub release](https://github.com/frontmost-ai/sdks/releases/tag/v0.2.1). The packages go on npm, PyPI, and crates.io next.
 
 It runs on Python 3.9 or later. It has a sync client and an async client, and full type hints.
 

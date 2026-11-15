@@ -37,17 +37,18 @@ Ian must do these steps once, because each one needs his sign-in. The workflow c
 
 npm trusts a workflow only for a package that already exists. So the first version goes up by hand.
 
-1. Sign in at [npmjs.com](https://www.npmjs.com). Create the organization `frontmost-ai`.
+1. Sign in at [npmjs.com](https://www.npmjs.com) as the user `frontmost-ai`. That user owns the `@frontmost-ai` scope.
 2. Run `npm login` on your computer.
-3. Run `cd typescript && npm ci && npm run build && npm publish --provenance=false`.
-4. On npmjs.com, open **@frontmost-ai/sdk > Settings > Trusted Publisher**.
-5. Choose GitHub Actions. Enter organization `frontmost-ai`, repository `sdks`, workflow `release.yml`, and environment `release`.
+3. Turn on two-factor authentication with a security key.
+4. Run `cd typescript && npm ci && npm run build && npm publish --access public --provenance=false --auth-type=web` in an interactive terminal. Approve the link that npm prints.
+5. On npmjs.com, open **@frontmost-ai/sdk > Settings > Trusted Publisher**.
+6. Choose GitHub Actions. Enter organization `frontmost-ai`, repository `sdks`, workflow `release.yml`, and environment `release`. Select **Allow npm publish**, so the hourly run can release without a manual approval.
 
 ### PyPI
 
 PyPI trusts a workflow before the project exists.
 
-1. Sign in at [pypi.org](https://pypi.org).
+1. Sign in at [pypi.org](https://pypi.org). Turn on two-factor authentication, because PyPI requires it for this step.
 2. Open **Your projects > Publishing > Add a new pending publisher**.
 3. Enter project `frontmost`, owner `frontmost-ai`, repository `sdks`, workflow `release.yml`, and environment `release`.
 
@@ -63,15 +64,10 @@ crates.io trusts a workflow only for a crate that already exists. So the first v
 
 ### After the setup
 
-Version 0.1.0 is already a GitHub release with the three packages attached. Its Release run was cancelled, because no registry trusted the workflow yet.
+npm marks a new trusted publisher "Pending validation" until the workflow publishes once. The pending state ends about two days after you add it.
 
-1. Open **Actions > Release** in GitHub.
-2. Open the run for tag `v0.1.0`.
-3. Click **Re-run all jobs**.
-
-The npm and crates.io jobs skip 0.1.0, because you published it by hand. The PyPI job publishes it. The next API change publishes all three SDKs.
-
-Then change the install commands in `README.md`, each language README, and the Frontmost AI API docs to the registry commands.
+1. Release one version by hand, as in "Release by hand", with a patch bump.
+2. Make sure that npm, PyPI, and crates.io each show the new version.
 
 ## Keep the hourly run alive
 

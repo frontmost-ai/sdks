@@ -12,18 +12,16 @@ These are the official TypeScript, Python, and Rust clients for the [Frontmost A
 
 ## Install
 
-Version 0.2.1 installs from [its GitHub release](https://github.com/frontmost-ai/sdks/releases/tag/v0.2.1). The packages go on npm, PyPI, and crates.io next.
-
 ```bash
-npm install https://github.com/frontmost-ai/sdks/releases/download/v0.2.1/frontmost-ai-sdk-0.2.1.tgz
+npm install @frontmost-ai/sdk
 ```
 
 ```bash
-pip install https://github.com/frontmost-ai/sdks/releases/download/v0.2.1/frontmost-0.2.1-py3-none-any.whl
+pip install frontmost
 ```
 
 ```bash
-cargo add frontmost-ai --git https://github.com/frontmost-ai/sdks --tag v0.2.1
+cargo add frontmost-ai
 ```
 
 ## Get a key
