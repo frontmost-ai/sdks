@@ -63,10 +63,15 @@ crates.io trusts a workflow only for a crate that already exists. So the first v
 
 ### After the setup
 
-1. Open **Actions > Release** in GitHub.
-2. Click **Run workflow**.
+Version 0.1.0 is already a GitHub release with the three packages attached. Its Release run was cancelled, because no registry trusted the workflow yet.
 
-A run with no spec change publishes nothing and passes. The next API change publishes all three SDKs.
+1. Open **Actions > Release** in GitHub.
+2. Open the run for tag `v0.1.0`.
+3. Click **Re-run all jobs**.
+
+The npm and crates.io jobs skip 0.1.0, because you published it by hand. The PyPI job publishes it. The next API change publishes all three SDKs.
+
+Then change the install commands in `README.md`, each language README, and the Frontmost AI API docs to the registry commands.
 
 ## Keep the hourly run alive
 

@@ -3,8 +3,10 @@
 Find out when ChatGPT and other AI apps recommend your business, and who they recommend instead. This crate gives your code and agents typed, async access to the [Frontmost AI API](https://app.frontmost.ai/api/v1/openapi.json).
 
 ```bash
-cargo add frontmost-ai
+cargo add frontmost-ai --git https://github.com/frontmost-ai/sdks --tag v0.1.0
 ```
+
+Version 0.1.0 installs from [its GitHub release](https://github.com/frontmost-ai/sdks/releases/tag/v0.1.0). The packages go on npm, PyPI, and crates.io next.
 
 It runs on Tokio and uses `rustls` for TLS. The examples also use Tokio's macros and `futures::StreamExt`:
 

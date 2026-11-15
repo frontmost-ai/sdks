@@ -4,11 +4,27 @@ Find out when ChatGPT and other AI apps recommend your business, and who they re
 
 These are the official TypeScript, Python, and Rust clients for the [Frontmost AI API](https://app.frontmost.ai/api/v1/openapi.json).
 
-| Language | Install | Docs |
+| Language | Package | Docs |
 | --- | --- | --- |
-| TypeScript | `npm install @frontmost-ai/sdk` | [typescript/README.md](typescript/README.md) |
-| Python | `pip install frontmost` | [python/README.md](python/README.md) |
-| Rust | `cargo add frontmost-ai` | [rust/README.md](rust/README.md) |
+| TypeScript | `@frontmost-ai/sdk` | [typescript/README.md](typescript/README.md) |
+| Python | `frontmost` | [python/README.md](python/README.md) |
+| Rust | `frontmost-ai` | [rust/README.md](rust/README.md) |
+
+## Install
+
+Version 0.1.0 installs from [its GitHub release](https://github.com/frontmost-ai/sdks/releases/tag/v0.1.0). The packages go on npm, PyPI, and crates.io next.
+
+```bash
+npm install https://github.com/frontmost-ai/sdks/releases/download/v0.1.0/frontmost-ai-sdk-0.1.0.tgz
+```
+
+```bash
+pip install https://github.com/frontmost-ai/sdks/releases/download/v0.1.0/frontmost-0.1.0-py3-none-any.whl
+```
+
+```bash
+cargo add frontmost-ai --git https://github.com/frontmost-ai/sdks --tag v0.1.0
+```
 
 ## Get a key
 
