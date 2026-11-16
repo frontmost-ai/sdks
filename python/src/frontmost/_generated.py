@@ -509,35 +509,35 @@ class AddedQuestionList(TypedDict):
     next_cursor: Optional[str]
 
 
-class ScanOverviewProject(TypedDict):
+class ScanOverviewProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class ScanOverview(TypedDict):
+class ScanOverview(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_scan"""
 
     project: ScanOverviewProject
 
 
-class QuestionsTabProject(TypedDict):
+class QuestionsTabProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class QuestionsTab(TypedDict):
+class QuestionsTab(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_questions"""
 
     project: QuestionsTabProject
 
 
-class ScanAnswersAnswersItem(TypedDict):
+class ScanAnswersAnswersItem(TypedDict, extra_items=Any):
     id: str
 
 
-class ScanAnswers(TypedDict):
+class ScanAnswers(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_answers"""
 
     scan_id: NotRequired[str]
@@ -546,134 +546,134 @@ class ScanAnswers(TypedDict):
     next_cursor: Optional[str]
 
 
-class SourcesTabProject(TypedDict):
+class SourcesTabProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class SourcesTab(TypedDict):
+class SourcesTab(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_sources"""
 
     project: SourcesTabProject
 
 
-class RivalsTabProject(TypedDict):
+class RivalsTabProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class RivalsTab(TypedDict):
+class RivalsTab(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_rivals"""
 
     project: RivalsTabProject
 
 
-class ProfilesTabProject(TypedDict):
+class ProfilesTabProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class ProfilesTab(TypedDict):
+class ProfilesTab(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_profiles"""
 
     project: ProfilesTabProject
 
 
-class ReadinessProject(TypedDict):
+class ReadinessProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class Readiness(TypedDict):
+class Readiness(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_readiness"""
 
     project: ReadinessProject
 
 
-class QueriesProject(TypedDict):
+class QueriesProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class Queries(TypedDict):
+class Queries(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_queries"""
 
     project: QueriesProject
 
 
-class ScorecardProject(TypedDict):
+class ScorecardProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class ScorecardViewsItem(TypedDict):
+class ScorecardViewsItem(TypedDict, extra_items=Any):
     key: str
     name: str
 
 
-class Scorecard(TypedDict):
+class Scorecard(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_scorecard"""
 
     project: ScorecardProject
     views: list[ScorecardViewsItem]
 
 
-class ScorecardViewsViewsItem(TypedDict):
+class ScorecardViewsViewsItem(TypedDict, extra_items=Any):
     key: str
     name: str
 
 
-class ScorecardViews(TypedDict):
+class ScorecardViews(TypedDict, extra_items=Any):
     """The same fields as the MCP tool edit_scorecard_views"""
 
     views: list[ScorecardViewsViewsItem]
     url: str
 
 
-class BriefProject(TypedDict):
+class BriefProject(TypedDict, extra_items=Any):
     id: str
     name: str
     url: str
 
 
-class Brief(TypedDict):
+class Brief(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_brief"""
 
     project: BriefProject
 
 
-class BriefRating(TypedDict):
+class BriefRating(TypedDict, extra_items=Any):
     """The same fields as the MCP tool rate_brief"""
 
     brief_id: str
     message: str
 
 
-class ScanShare(TypedDict):
+class ScanShare(TypedDict, extra_items=Any):
     """The same fields as the MCP tool share_scan"""
 
     scan_id: str
 
 
-class Leaderboards(TypedDict):
+class Leaderboards(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_leaderboard without industry"""
 
     leaderboards: list[dict[str, Any]]
 
 
-class LeaderboardLeaderboard(TypedDict):
+class LeaderboardLeaderboard(TypedDict, extra_items=Any):
     industry: str
     name: str
     url: str
 
 
-class Leaderboard(TypedDict):
+class Leaderboard(TypedDict, extra_items=Any):
     """The same fields as the MCP tool get_leaderboard"""
 
     leaderboard: LeaderboardLeaderboard

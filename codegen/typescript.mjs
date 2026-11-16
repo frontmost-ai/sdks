@@ -27,6 +27,8 @@ function ts(s, indent = "") {
       const req = new Set(s.required ?? []);
       const inner = indent + "  ";
       const lines = props.map(([k, v]) => `${doc(v.description, inner)}${inner}${k}${req.has(k) ? "" : "?"}: ${ts(v, inner)};`);
+      // An open object (additionalProperties) has more fields than it names, so the type lets the caller read them.
+      if (s.additionalProperties !== undefined && s.additionalProperties !== false) lines.push(`${inner}[key: string]: unknown;`);
       return `{\n${lines.join("\n")}\n${indent}}`;
     }
     default: return "unknown";

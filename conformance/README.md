@@ -17,6 +17,7 @@ Run `node conformance/run.mjs`. It starts the mock and runs each language's test
 | 9 | `projects.get("6")` with a 100 ms timeout and 1 retry | No reply for 1 s | Make 2 attempts, then raise the timeout error. |
 | 10 | `workspace.get()` at `http://127.0.0.1:9/v1` with 0 retries | No server | Raise the connection error, and not the timeout error. |
 | 11 | `projects.createAndWait({ domain })` | 202 with `next`, then 201 | Send `next.body` to `next.path`, with a new `Idempotency-Key`. Return the project. |
+| 12 | `scans.get("12", "latest")` | 200 with `kpis`, a field that the schema does not name | Return `kpis`, and let the caller read it with no cast. |
 
 Every request sends `Authorization: Bearer <key>`, `x-frontmost-lang`, and `x-frontmost-package-version`.
 `GET /__log` on the mock returns each request it saw. `POST /__reset` clears it.

@@ -445,7 +445,9 @@ export type ScanOverview = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_questions */
@@ -454,7 +456,9 @@ export type QuestionsTab = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_answers */
@@ -463,8 +467,10 @@ export type ScanAnswers = {
   total: number;
   answers: Array<{
     id: string;
+    [key: string]: unknown;
   }>;
   next_cursor: string | null;
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_sources */
@@ -473,7 +479,9 @@ export type SourcesTab = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_rivals */
@@ -482,7 +490,9 @@ export type RivalsTab = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_profiles */
@@ -491,7 +501,9 @@ export type ProfilesTab = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_readiness */
@@ -500,7 +512,9 @@ export type Readiness = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_queries */
@@ -509,7 +523,9 @@ export type Queries = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_scorecard */
@@ -518,11 +534,14 @@ export type Scorecard = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
   views: Array<{
     key: string;
     name: string;
+    [key: string]: unknown;
   }>;
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool edit_scorecard_views */
@@ -530,8 +549,10 @@ export type ScorecardViews = {
   views: Array<{
     key: string;
     name: string;
+    [key: string]: unknown;
   }>;
   url: string;
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_brief */
@@ -540,23 +561,28 @@ export type Brief = {
     id: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool rate_brief */
 export type BriefRating = {
   brief_id: string;
   message: string;
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool share_scan */
 export type ScanShare = {
   scan_id: string;
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_leaderboard without industry */
 export type Leaderboards = {
   leaderboards: Array<Record<string, unknown>>;
+  [key: string]: unknown;
 };
 
 /** The same fields as the MCP tool get_leaderboard */
@@ -565,7 +591,9 @@ export type Leaderboard = {
     industry: string;
     name: string;
     url: string;
+    [key: string]: unknown;
   };
+  [key: string]: unknown;
 };
 
 export type Industries = {

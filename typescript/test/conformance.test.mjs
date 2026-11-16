@@ -86,6 +86,11 @@ test("11 createAndWait follows the 202 to the project", async () => {
   assert.notEqual(seen[0].headers["idempotency-key"], seen[1].headers["idempotency-key"]);
 });
 
+test("12 keeps the fields that an open reply does not name", async () => {
+  const scan = await client.scans.get("12", "latest");
+  assert.deepEqual(scan.kpis, { visibility: 22 });
+});
+
 test("formatRate shows the rate with its counts", () => {
   assert.equal(formatRate({ value: 8 / 36, numerator: 8, denominator: 36, previous: null }), "22% · 8 of 36");
   assert.equal(formatRate({ value: null, numerator: 0, denominator: 0, previous: null }), "No answers");

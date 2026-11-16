@@ -62,7 +62,9 @@ function typedDict(name, s) {
     const type = py(v, `${name}${pascal(ident(k, name))}`);
     return `${comment(v.description, "    ")}    ${k}: ${req.has(k) ? type : `NotRequired[${type}]`}`;
   });
-  out.push(`class ${name}(TypedDict):\n${docstring(s.description, "    ")}${fields.join("\n")}\n\n\n`);
+  // An open object (additionalProperties) has more fields than it names: PEP 728 lets the caller read them.
+  const open = s.additionalProperties !== undefined && s.additionalProperties !== false;
+  out.push(`class ${name}(TypedDict${open ? ", extra_items=Any" : ""}):\n${docstring(s.description, "    ")}${fields.join("\n")}\n\n\n`);
   exported.push(name);
   return name;
 }

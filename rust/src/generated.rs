@@ -654,12 +654,18 @@ pub struct ScanOverviewProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_scan
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ScanOverview {
     pub project: ScanOverviewProject,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -667,17 +673,26 @@ pub struct QuestionsTabProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_questions
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct QuestionsTab {
     pub project: QuestionsTabProject,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ScanAnswersAnswer {
     pub id: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_answers
@@ -688,6 +703,9 @@ pub struct ScanAnswers {
     pub total: i64,
     pub answers: Vec<ScanAnswersAnswer>,
     pub next_cursor: Option<String>,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -695,12 +713,18 @@ pub struct SourcesTabProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_sources
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SourcesTab {
     pub project: SourcesTabProject,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -708,12 +732,18 @@ pub struct RivalsTabProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_rivals
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RivalsTab {
     pub project: RivalsTabProject,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -721,12 +751,18 @@ pub struct ProfilesTabProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_profiles
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct ProfilesTab {
     pub project: ProfilesTabProject,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -734,12 +770,18 @@ pub struct ReadinessProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_readiness
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Readiness {
     pub project: ReadinessProject,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -747,12 +789,18 @@ pub struct QueriesProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_queries
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Queries {
     pub project: QueriesProject,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -760,12 +808,18 @@ pub struct ScorecardProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ScorecardView {
     pub key: String,
     pub name: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_scorecard
@@ -773,12 +827,18 @@ pub struct ScorecardView {
 pub struct Scorecard {
     pub project: ScorecardProject,
     pub views: Vec<ScorecardView>,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ScorecardViewsView {
     pub key: String,
     pub name: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool edit_scorecard_views
@@ -786,6 +846,9 @@ pub struct ScorecardViewsView {
 pub struct ScorecardViews {
     pub views: Vec<ScorecardViewsView>,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -793,12 +856,18 @@ pub struct BriefProject {
     pub id: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_brief
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Brief {
     pub project: BriefProject,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool rate_brief
@@ -806,18 +875,27 @@ pub struct Brief {
 pub struct BriefRating {
     pub brief_id: String,
     pub message: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool share_scan
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ScanShare {
     pub scan_id: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_leaderboard without industry
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct Leaderboards {
     pub leaderboards: Vec<serde_json::Map<String, serde_json::Value>>,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -825,12 +903,18 @@ pub struct LeaderboardLeaderboard {
     pub industry: String,
     pub name: String,
     pub url: String,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 /// The same fields as the MCP tool get_leaderboard
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Leaderboard {
     pub leaderboard: LeaderboardLeaderboard,
+    /// The fields that this type does not name.
+    #[serde(flatten)]
+    pub extra: serde_json::Map<String, serde_json::Value>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]

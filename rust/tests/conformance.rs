@@ -183,4 +183,10 @@ async fn conformance() {
         header(&seen[1], "idempotency-key"),
     );
     assert!(first.is_some() && second.is_some() && first != second);
+
+    // 12 keeps the fields that an open reply does not name
+    mock.reset().await;
+    let scan = client.scans().get("12", "latest", None, None).await.unwrap();
+    assert_eq!(scan.project.id, "12");
+    assert_eq!(scan.extra["kpis"], serde_json::json!({ "visibility": 22 }));
 }

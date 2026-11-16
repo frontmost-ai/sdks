@@ -143,6 +143,11 @@ def test_async_11_create_and_wait_follows_the_202_to_the_project() -> None:
     assert len(log()) == 2
 
 
+def test_12_keeps_the_fields_that_an_open_reply_does_not_name() -> None:
+    scan = client.scans.get("12", "latest")
+    assert scan["kpis"] == {"visibility": 22}
+
+
 def test_format_rate_shows_the_rate_with_its_counts() -> None:
     assert format_rate({"value": 8 / 36, "numerator": 8, "denominator": 36, "previous": None}) == "22% · 8 of 36"
     assert format_rate({"value": None, "numerator": 0, "denominator": 0, "previous": None}) == "No answers"

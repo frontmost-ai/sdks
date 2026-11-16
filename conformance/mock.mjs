@@ -94,6 +94,9 @@ const server = createServer(async (req, res) => {
       if (body.setup_id === "12") return reply(res, 201, project);
       return reply(res, 202, { object: "project_setup", id: "12", status: "drafting", domain: body.domain, retry_after: 0, next: { method: "POST", path: "/v1/projects", body: { setup_id: "12" } } });
     }
+    // Case 12: an open reply with a field that its schema does not name.
+    case "GET /v1/projects/12/scans/latest":
+      return reply(res, 200, { project: { id: "12", name: "Papaya", url: "https://app.frontmost.ai/projects/12" }, kpis: { visibility: 22 } });
     default:
       return reply(res, 404, error("not_found", `The mock has no case for ${key}.`, "req_mock"));
   }

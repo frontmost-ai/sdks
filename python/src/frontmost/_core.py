@@ -14,7 +14,7 @@ from typing import Any, Generic, Literal, Optional, TypeVar, Union, cast
 import httpx
 from typing_extensions import TypedDict
 
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 DEFAULT_BASE_URL = "https://app.frontmost.ai/api/v1"
 # The longest time an `..._and_wait` method waits, in seconds, before it stops with an error.
 WAIT_LIMIT = 600.0

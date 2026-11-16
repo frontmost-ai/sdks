@@ -1,6 +1,6 @@
 [project]
 name = "frontmost"
-version = "0.3.0"
+version = "0.4.0"
 description = "See when ChatGPT and other AI apps recommend your business, from your own code and agents."
 readme = "README.md"
 license = "MIT"
@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Typing :: Typed",
 ]
-dependencies = ["httpx>=0.23,<1", "typing-extensions>=4.7"]
+dependencies = ["httpx>=0.23,<1", "typing-extensions>=4.13"]
 
 [project.urls]
 Homepage = "https://frontmost.ai"

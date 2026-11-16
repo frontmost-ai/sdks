@@ -83,6 +83,11 @@ function struct(name, s, fields = Object.entries(s.properties ?? {}).map(([wire,
     const attr = attrs.length ? `    #[serde(${attrs.join(", ")})]\n` : "";
     return `${doc(description ?? schema.description, "    ")}${attr}    pub ${f.name}: ${type},`;
   });
+  // An open object (additionalProperties) has more fields than it names. serde drops unknown fields, so `extra` keeps them.
+  if (s.additionalProperties !== undefined && s.additionalProperties !== false) {
+    if (fields.some((f) => field(f.wire).name === "extra")) throw new Error(`${name}: a field named extra hides the open fields`);
+    lines.push(`    /// The fields that this type does not name.\n    #[serde(flatten)]\n    pub extra: serde_json::Map<String, serde_json::Value>,`);
+  }
   const derives = ["Debug", "Clone", "PartialEq", ...(defaultable ? ["Default"] : []), "Serialize", "Deserialize"];
   return define(name, `${doc(s.description)}#[derive(${derives.join(", ")})]\npub struct ${name} {\n${lines.join("\n")}\n}`);
 }
