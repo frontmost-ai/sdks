@@ -64,7 +64,8 @@ function typedDict(name, s) {
   });
   // An open object (additionalProperties) has more fields than it names: PEP 728 lets the caller read them.
   const open = s.additionalProperties !== undefined && s.additionalProperties !== false;
-  out.push(`class ${name}(TypedDict${open ? ", extra_items=Any" : ""}):\n${docstring(s.description, "    ")}${fields.join("\n")}\n\n\n`);
+  // mypy before 2.0 (the Python 3.9 CI) does not know extra_items, so the open class ignores that one error.
+  out.push(`class ${name}(TypedDict${open ? ", extra_items=Any):  # type: ignore[call-arg, unused-ignore]" : "):"}\n${docstring(s.description, "    ")}${fields.join("\n")}\n\n\n`);
   exported.push(name);
   return name;
 }

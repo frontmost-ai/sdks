@@ -509,35 +509,35 @@ class AddedQuestionList(TypedDict):
     next_cursor: Optional[str]
 
 
-class ScanOverviewProject(TypedDict, extra_items=Any):
+class ScanOverviewProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class ScanOverview(TypedDict, extra_items=Any):
+class ScanOverview(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_scan"""
 
     project: ScanOverviewProject
 
 
-class QuestionsTabProject(TypedDict, extra_items=Any):
+class QuestionsTabProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class QuestionsTab(TypedDict, extra_items=Any):
+class QuestionsTab(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_questions"""
 
     project: QuestionsTabProject
 
 
-class ScanAnswersAnswersItem(TypedDict, extra_items=Any):
+class ScanAnswersAnswersItem(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
 
 
-class ScanAnswers(TypedDict, extra_items=Any):
+class ScanAnswers(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_answers"""
 
     scan_id: NotRequired[str]
@@ -546,134 +546,134 @@ class ScanAnswers(TypedDict, extra_items=Any):
     next_cursor: Optional[str]
 
 
-class SourcesTabProject(TypedDict, extra_items=Any):
+class SourcesTabProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class SourcesTab(TypedDict, extra_items=Any):
+class SourcesTab(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_sources"""
 
     project: SourcesTabProject
 
 
-class RivalsTabProject(TypedDict, extra_items=Any):
+class RivalsTabProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class RivalsTab(TypedDict, extra_items=Any):
+class RivalsTab(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_rivals"""
 
     project: RivalsTabProject
 
 
-class ProfilesTabProject(TypedDict, extra_items=Any):
+class ProfilesTabProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class ProfilesTab(TypedDict, extra_items=Any):
+class ProfilesTab(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_profiles"""
 
     project: ProfilesTabProject
 
 
-class ReadinessProject(TypedDict, extra_items=Any):
+class ReadinessProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class Readiness(TypedDict, extra_items=Any):
+class Readiness(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_readiness"""
 
     project: ReadinessProject
 
 
-class QueriesProject(TypedDict, extra_items=Any):
+class QueriesProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class Queries(TypedDict, extra_items=Any):
+class Queries(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_queries"""
 
     project: QueriesProject
 
 
-class ScorecardProject(TypedDict, extra_items=Any):
+class ScorecardProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class ScorecardViewsItem(TypedDict, extra_items=Any):
+class ScorecardViewsItem(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     key: str
     name: str
 
 
-class Scorecard(TypedDict, extra_items=Any):
+class Scorecard(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_scorecard"""
 
     project: ScorecardProject
     views: list[ScorecardViewsItem]
 
 
-class ScorecardViewsViewsItem(TypedDict, extra_items=Any):
+class ScorecardViewsViewsItem(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     key: str
     name: str
 
 
-class ScorecardViews(TypedDict, extra_items=Any):
+class ScorecardViews(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool edit_scorecard_views"""
 
     views: list[ScorecardViewsViewsItem]
     url: str
 
 
-class BriefProject(TypedDict, extra_items=Any):
+class BriefProject(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     id: str
     name: str
     url: str
 
 
-class Brief(TypedDict, extra_items=Any):
+class Brief(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_brief"""
 
     project: BriefProject
 
 
-class BriefRating(TypedDict, extra_items=Any):
+class BriefRating(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool rate_brief"""
 
     brief_id: str
     message: str
 
 
-class ScanShare(TypedDict, extra_items=Any):
+class ScanShare(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool share_scan"""
 
     scan_id: str
 
 
-class Leaderboards(TypedDict, extra_items=Any):
+class Leaderboards(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_leaderboard without industry"""
 
     leaderboards: list[dict[str, Any]]
 
 
-class LeaderboardLeaderboard(TypedDict, extra_items=Any):
+class LeaderboardLeaderboard(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     industry: str
     name: str
     url: str
 
 
-class Leaderboard(TypedDict, extra_items=Any):
+class Leaderboard(TypedDict, extra_items=Any):  # type: ignore[call-arg, unused-ignore]
     """The same fields as the MCP tool get_leaderboard"""
 
     leaderboard: LeaderboardLeaderboard

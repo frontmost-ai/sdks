@@ -145,7 +145,7 @@ def test_async_11_create_and_wait_follows_the_202_to_the_project() -> None:
 
 def test_12_keeps_the_fields_that_an_open_reply_does_not_name() -> None:
     scan = client.scans.get("12", "latest")
-    assert scan["kpis"] == {"visibility": 22}
+    assert dict(scan)["kpis"] == {"visibility": 22}
 
 
 def test_format_rate_shows_the_rate_with_its_counts() -> None:
