@@ -109,6 +109,13 @@ export type RunConfig = {
   cost: RunCost;
 };
 
+export type NextScan = {
+  /** When the next scheduled scan delivers. Null when none is scheduled */
+  at: string | null;
+  /** Why no scan is scheduled. daily: the project's cadence is off. plan: the plan has no scans now */
+  off: "daily" | "plan" | null;
+};
+
 export type Project = {
   object: "project";
   id: string;
@@ -124,6 +131,7 @@ export type Project = {
   /** Older field. The same as run_config.weekly_brief */
   weekly_brief: boolean;
   created_at: string | null;
+  next_scan: NextScan;
   url: string;
 };
 
@@ -431,6 +439,143 @@ export type AddedQuestionList = {
   next_cursor: string | null;
 };
 
+/** The same fields as the MCP tool get_scan */
+export type ScanOverview = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+};
+
+/** The same fields as the MCP tool get_questions */
+export type QuestionsTab = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+};
+
+/** The same fields as the MCP tool get_answers */
+export type ScanAnswers = {
+  scan_id?: string;
+  total: number;
+  answers: Array<{
+    id: string;
+  }>;
+  next_cursor: string | null;
+};
+
+/** The same fields as the MCP tool get_sources */
+export type SourcesTab = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+};
+
+/** The same fields as the MCP tool get_rivals */
+export type RivalsTab = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+};
+
+/** The same fields as the MCP tool get_profiles */
+export type ProfilesTab = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+};
+
+/** The same fields as the MCP tool get_readiness */
+export type Readiness = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+};
+
+/** The same fields as the MCP tool get_queries */
+export type Queries = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+};
+
+/** The same fields as the MCP tool get_scorecard */
+export type Scorecard = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+  views: Array<{
+    key: string;
+    name: string;
+  }>;
+};
+
+/** The same fields as the MCP tool edit_scorecard_views */
+export type ScorecardViews = {
+  views: Array<{
+    key: string;
+    name: string;
+  }>;
+  url: string;
+};
+
+/** The same fields as the MCP tool get_brief */
+export type Brief = {
+  project: {
+    id: string;
+    name: string;
+    url: string;
+  };
+};
+
+/** The same fields as the MCP tool rate_brief */
+export type BriefRating = {
+  brief_id: string;
+  message: string;
+};
+
+/** The same fields as the MCP tool share_scan */
+export type ScanShare = {
+  scan_id: string;
+};
+
+/** The same fields as the MCP tool get_leaderboard without industry */
+export type Leaderboards = {
+  leaderboards: Array<Record<string, unknown>>;
+};
+
+/** The same fields as the MCP tool get_leaderboard */
+export type Leaderboard = {
+  leaderboard: {
+    industry: string;
+    name: string;
+    url: string;
+  };
+};
+
+export type Industries = {
+  industries: Array<{
+    /** A six-digit NAICS 2022 code */
+    code: string;
+    title: string;
+  }>;
+};
+
 export type ProjectsListParams = {
   /** Find projects by name or domain */
   q?: string;
@@ -485,6 +630,11 @@ export type ProjectsUpdateBody = {
   cadence?: ProjectCadence;
   /** Older field. Use run_config.weekly_brief */
   weekly_brief?: boolean;
+};
+
+export type ProjectsDeleteParams = {
+  /** The project's exact name, to confirm the delete */
+  confirm_name: string;
 };
 
 export type ScansListParams = {
@@ -625,6 +775,168 @@ export type RecommendationsUpdateBody = {
   status: RecommendationStatus;
 };
 
+export type ScansGetParams = {
+  /** Count one scan, or add up the scans of a period. A week runs Monday to Sunday */
+  period?: "scan" | "7d" | "week" | "4w" | "month" | "quarter";
+  /** previous, none, or a scan ID to compare with */
+  compare_to?: string;
+  /** Only one AI app, such as chatgpt. Default: every app of the project */
+  app?: string;
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+};
+
+export type ScansQuestionsParams = {
+  /** Open one question's page: every AI app's answer, its full history, and ChatGPT's web searches */
+  question_id?: string;
+  /** true keeps only questions about a place; false keeps the rest */
+  location?: boolean;
+  /** Only one AI app, such as chatgpt. Default: every app of the project */
+  app?: string;
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+};
+
+export type ScansAnswersParams = {
+  /** Only answers to this question */
+  question_id?: string;
+  /** Only one AI app, such as chatgpt. Default: every app of the project */
+  app?: string;
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+  /** true: answers that name you. false: answers that do not */
+  named?: boolean;
+  /** Only answers that named this rival */
+  rival_id?: string;
+  /** Only answers with this sentiment about you */
+  sentiment?: Sentiment;
+  /** Only answers that cite this site, such as reddit.com */
+  domain?: string;
+  /** Only answers that cite this exact page. Copy the url from the Sources tab */
+  page_url?: string;
+  /** With page_url: the exact answers that a Reach result counted for one page. Copy answers_filter from the Sources tab */
+  reach_result_id?: string;
+  /** A date like 2026-10-01 (UTC) or an ISO time. Lists the answers of every delivered scan from then through this scan */
+  since?: string;
+  /** Answers, 1 to 20. Default 10 */
+  limit?: number;
+  /** The next_cursor of the answers before */
+  cursor?: string;
+};
+
+export type ScansSourcesParams = {
+  /** Open one cited site's page, like g2.com */
+  domain?: string;
+  /** With domain reddit.com: open one subreddit's page */
+  subreddit?: string;
+  /** A date like 2026-10-01. Counts every delivered scan from then through the scan, in place of the 4 weeks */
+  since?: string;
+  /** Up to 50 page URLs, comma-separated, to read again */
+  page_urls?: string;
+  /** Only one AI app, such as chatgpt. Default: every app of the project */
+  app?: string;
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+};
+
+export type ScansRivalsParams = {
+  /** Open one rival's page: you against it on every KPI, by AI app, and by topic */
+  rival_id?: string;
+  /** Default named: most named first */
+  sort?: "named" | "position" | "win";
+  /** Only one AI app, such as chatgpt. Default: every app of the project */
+  app?: string;
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+};
+
+export type ScansProfilesParams = {
+  /** Only one AI app, such as chatgpt. Default: every app of the project */
+  app?: string;
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+};
+
+export type ScansReadinessParams = {
+  /** Only one AI app, such as chatgpt. Default: every app of the project */
+  app?: string;
+};
+
+export type ScansQueriesParams = {
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+};
+
+export type ScorecardGetParams = {
+  /** A view's name or key. Default: the first view */
+  view?: string;
+  /** day, 7d, week, or month. Default: the view's own period */
+  period?: "day" | "7d" | "week" | "month";
+  /** Show or hide the rows under each headline. Default: the view's own setting */
+  break_down?: boolean;
+  /** Only one AI app, such as chatgpt. Default: every app of the project */
+  app?: string;
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+};
+
+export type ScorecardUpdateBody = {
+  /** Every view, in tab order. Read the Scorecard first and send its views back with your change */
+  views: Array<{
+    /** Keep a view's key to keep its links. Leave it out for a new view */
+    key?: string;
+    name: string;
+    group_by: "metric" | "business" | "app" | "profile" | "topic";
+    items: "all" | Array<string>;
+    metrics?: Array<"visibility" | "position" | "sentiment" | "win" | "sov">;
+    break_down?: boolean;
+    period: "day" | "7d" | "week" | "month";
+    /** Prior, Change, and % Change under each headline row. Default true */
+    change_rows?: boolean;
+  }>;
+};
+
+export type BriefGetParams = {
+  /** An earlier Weekly Deep Dive. Default: the latest one */
+  brief_id?: string;
+};
+
+export type BriefRateBody = {
+  /** The brief's ID */
+  brief_id: string;
+  /** true for useful, false for not useful */
+  useful: boolean;
+  /** What made it useful, or what would make the briefs more useful */
+  note?: string;
+};
+
+export type ScansShareBody = {
+  /** 1 to 10 email addresses */
+  to: Array<string>;
+  /** Which questions to count. Branded questions name your business */
+  questions?: QuestionSet;
+};
+
+export type LeaderboardsGetParams = {
+  /** Rank by one AI app's answers */
+  app?: string;
+  /** Rank by one topic's answers */
+  topic?: string;
+  /** Rows, 1 to 100. Default 10. Answers take 20 at most */
+  limit?: number;
+  /** Read the answers that name this company */
+  company_id?: string;
+  /** With company_id: only answers that name it first */
+  first?: boolean;
+  /** The next_cursor of the answers before */
+  cursor?: string;
+};
+
+export type IndustriesSearchParams = {
+  /** Plain words or the start of a NAICS code */
+  q: string;
+};
+
 export class WorkspaceResource {
   constructor(private readonly core: Core) {}
 
@@ -663,6 +975,11 @@ export class ProjectsResource {
     return this.core.request("PATCH", `/projects/${encodeURIComponent(id)}`, { body, options });
   }
 
+  /** Delete a project with its scans, answers, and recommendations. This cannot be undone `DELETE /projects/{id}` */
+  delete(id: string, params: ProjectsDeleteParams, options?: RequestOptions): Promise<void> {
+    return this.core.request("DELETE", `/projects/${encodeURIComponent(id)}`, { query: params, options });
+  }
+
 }
 
 export class ScansResource {
@@ -671,6 +988,51 @@ export class ScansResource {
   /** Delivered scans, newest first `GET /projects/{id}/scans` */
   list(projectId: string, params: ScansListParams = {}, options?: RequestOptions): Page<Scan, ScanList> {
     return this.core.list(`/projects/${encodeURIComponent(projectId)}/scans`, params, options);
+  }
+
+  /** The scan's Overview: KPIs per AI app, trend, rivals, sources, top pages, every question's result, and coverage `GET /projects/{id}/scans/{scan_id}` */
+  get(projectId: string, scanId: string, params: ScansGetParams = {}, options?: RequestOptions): Promise<ScanOverview> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}`, { query: params, options });
+  }
+
+  /** The Questions tab: each question's result per AI app, the business named first, won or lost, and 12 scans of history `GET /projects/{id}/scans/{scan_id}/questions` */
+  questions(projectId: string, scanId: string, params: ScansQuestionsParams = {}, options?: RequestOptions): Promise<QuestionsTab> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}/questions`, { query: params, options });
+  }
+
+  /** The scan's answers, with the MCP get_answers filters. Get one answer by ID to read its text `GET /projects/{id}/scans/{scan_id}/answers` */
+  answers(projectId: string, scanId: string, params: ScansAnswersParams = {}, options?: RequestOptions): Promise<ScanAnswers> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}/answers`, { query: params, options });
+  }
+
+  /** The Sources tab: pages to get on, pages by Reach, and the most cited sites, over the scan and the 4 weeks before it `GET /projects/{id}/scans/{scan_id}/sources` */
+  sources(projectId: string, scanId: string, params: ScansSourcesParams = {}, options?: RequestOptions): Promise<SourcesTab> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}/sources`, { query: params, options });
+  }
+
+  /** The Rivals tab: every business AI named, with named instead of you, named first, position, share of voice, change, and history `GET /projects/{id}/scans/{scan_id}/rivals` */
+  rivals(projectId: string, scanId: string, params: ScansRivalsParams = {}, options?: RequestOptions): Promise<RivalsTab> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}/rivals`, { query: params, options });
+  }
+
+  /** The Profiles tab: each buyer profile's Visibility, Win Rate, and Share of Voice against the top 5 rivals `GET /projects/{id}/scans/{scan_id}/profiles` */
+  profiles(projectId: string, scanId: string, params: ScansProfilesParams = {}, options?: RequestOptions): Promise<ProfilesTab> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}/profiles`, { query: params, options });
+  }
+
+  /** AI Readiness: whether each AI app can read your website, with the failed checks and what to change `GET /projects/{id}/scans/{scan_id}/readiness` */
+  readiness(projectId: string, scanId: string, params: ScansReadinessParams = {}, options?: RequestOptions): Promise<Readiness> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}/readiness`, { query: params, options });
+  }
+
+  /** The web searches ChatGPT ran while it answered, in the scan's week, and how many of those answers named you `GET /projects/{id}/scans/{scan_id}/queries` */
+  queries(projectId: string, scanId: string, params: ScansQueriesParams = {}, options?: RequestOptions): Promise<Queries> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}/queries`, { query: params, options });
+  }
+
+  /** Email the scan's results with the PDF report to up to 10 people. Replies go to you `POST /projects/{id}/scans/{scan_id}/share` */
+  share(projectId: string, scanId: string, body: ScansShareBody, options?: RequestOptions): Promise<ScanShare> {
+    return this.core.request("POST", `/projects/${encodeURIComponent(projectId)}/scans/${encodeURIComponent(scanId)}/share`, { body, options });
   }
 
 }
@@ -780,6 +1142,61 @@ export class ProfilesResource {
 
 }
 
+export class ScorecardResource {
+  constructor(private readonly core: Core) {}
+
+  /** The Scorecard: your saved views, and one view as a sheet with a column per period `GET /projects/{id}/scorecard` */
+  get(projectId: string, params: ScorecardGetParams = {}, options?: RequestOptions): Promise<Scorecard> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/scorecard`, { query: params, options });
+  }
+
+  /** Save the Scorecard's views. Send every view in tab order. A view left out is deleted `PATCH /projects/{id}/scorecard` */
+  update(projectId: string, body: ScorecardUpdateBody, options?: RequestOptions): Promise<ScorecardViews> {
+    return this.core.request("PATCH", `/projects/${encodeURIComponent(projectId)}/scorecard`, { body, options });
+  }
+
+}
+
+export class BriefResource {
+  constructor(private readonly core: Core) {}
+
+  /** The latest daily note and Weekly Deep Dive, with its findings and three actions `GET /projects/{id}/brief` */
+  get(projectId: string, params: BriefGetParams = {}, options?: RequestOptions): Promise<Brief> {
+    return this.core.request("GET", `/projects/${encodeURIComponent(projectId)}/brief`, { query: params, options });
+  }
+
+  /** Say whether a brief was useful. A new rating replaces the earlier one `POST /projects/{id}/brief/rating` */
+  rate(projectId: string, body: BriefRateBody, options?: RequestOptions): Promise<BriefRating> {
+    return this.core.request("POST", `/projects/${encodeURIComponent(projectId)}/brief/rating`, { body, options });
+  }
+
+}
+
+export class LeaderboardsResource {
+  constructor(private readonly core: Core) {}
+
+  /** Frontmost AI's public leaderboards, by industry `GET /leaderboards` */
+  list(options?: RequestOptions): Promise<Leaderboards> {
+    return this.core.request("GET", `/leaderboards`, { options });
+  }
+
+  /** Which companies AI apps name most for an industry's buyer questions, from the latest weekly scan `GET /leaderboards/{industry}` */
+  get(industry: string, params: LeaderboardsGetParams = {}, options?: RequestOptions): Promise<Leaderboard> {
+    return this.core.request("GET", `/leaderboards/${encodeURIComponent(industry)}`, { query: params, options });
+  }
+
+}
+
+export class IndustriesResource {
+  constructor(private readonly core: Core) {}
+
+  /** Find NAICS industries by plain words, such as dentist, or by code `GET /industries` */
+  search(params: IndustriesSearchParams, options?: RequestOptions): Promise<Industries> {
+    return this.core.request("GET", `/industries`, { query: params, options });
+  }
+
+}
+
 /** The Frontmost AI client. `new Frontmost()` reads FRONTMOST_API_KEY. */
 export class Frontmost extends Core {
   readonly workspace = new WorkspaceResource(this);
@@ -792,6 +1209,10 @@ export class Frontmost extends Core {
   readonly questions = new QuestionsResource(this);
   readonly recommendations = new RecommendationsResource(this);
   readonly profiles = new ProfilesResource(this);
+  readonly scorecard = new ScorecardResource(this);
+  readonly brief = new BriefResource(this);
+  readonly leaderboards = new LeaderboardsResource(this);
+  readonly industries = new IndustriesResource(this);
   constructor(options?: ClientOptions) {
     super(options);
   }

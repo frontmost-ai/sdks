@@ -29,7 +29,8 @@ const field = (wire) => {
 /** The code of a string enum. Every enum reads a value it does not know as `Unknown`, because lists of values can grow. */
 function enumCode(name, values, description) {
   const variants = values.map((v) => {
-    const variant = pascal(snake(String(v)));
+    // A Rust name cannot start with a digit, so "7d" is V7d.
+    const variant = pascal(snake(String(v))).replace(/^(\d)/, "V$1");
     const attr = snake(variant) === v ? "" : `    #[serde(rename = ${JSON.stringify(v)})]\n`;
     return `${attr}    ${variant},`;
   });

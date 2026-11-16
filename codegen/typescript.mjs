@@ -66,7 +66,8 @@ for (const resource of ir.resources) {
     const args = op.pathParams.map((p) => `${camel(p.name)}: string`);
     if (op.body) args.push(`body: ${base}Body`);
     const q = queryType(op);
-    if (q) args.push(`params: ${base}Params = {}`);
+    // A route with a required query param, such as industries.search with q, takes params with no default.
+    if (q) args.push(op.query.some((p) => p.required) ? `params: ${base}Params` : `params: ${base}Params = {}`);
     args.push(`options?: RequestOptions`);
     let path = op.path;
     for (const p of op.pathParams) path = path.replace(`{${p.wire}}`, `\${encodeURIComponent(${camel(p.name)})}`);

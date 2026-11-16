@@ -64,8 +64,11 @@ export function load(file = new URL("../spec/openapi.json", import.meta.url)) {
       const okStatus = Object.keys(op.responses).find((c) => /^2/.test(c) && c !== "202");
       const response = refName(json(okStatus));
       const query = params.filter((p) => p.in === "query").map((p) => ({ ...p, schema: share(queryBoolean(strip(p.schema))) }));
-      const paginated = query.some((p) => p.name === "cursor");
-      const item = response && paginated ? refName(raw[response]?.properties?.data?.items) : null;
+      // A list page has data and has_more. A route that takes a cursor but replies in another shape, such as
+      // scans.answers, returns its reply as it is, with its next_cursor.
+      const listPage = Boolean(response && raw[response]?.properties?.data && raw[response]?.properties?.has_more);
+      const paginated = listPage && query.some((p) => p.name === "cursor");
+      const item = paginated ? refName(raw[response]?.properties?.data?.items) : null;
       operations.push({
         resource,
         verb,

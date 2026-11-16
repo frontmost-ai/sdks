@@ -16,7 +16,7 @@ const workspace = {
 };
 const question = (id, text) => ({ object: "question", id, text, topic: "Business", active: true, is_branded: false, profile_id: null });
 const error = (code, message, request_id) => ({ error: { code, message, param: null, request_id } });
-const project = { object: "project", id: "12", name: "Papaya", domain: "papaya.example", apps: ["chatgpt"], scanning: true, cadence: "daily", weekly_brief: true, run_config: { apps: ["chatgpt"], cadence: "daily", weekly_brief: true, active_questions: 3, cost: { rates: [{ app: "chatgpt", credits_per_answer: 1 }], minimum_per_scan: 10, per_scan: 10, scans_per_month: 31, per_brief: 25, briefs_per_month: 5, monthly_max: 435 } }, created_at: "2026-11-14T00:00:00Z", url: "https://app.frontmost.ai/projects/12" };
+const project = { object: "project", id: "12", name: "Papaya", domain: "papaya.example", apps: ["chatgpt"], scanning: true, cadence: "daily", weekly_brief: true, run_config: { apps: ["chatgpt"], cadence: "daily", weekly_brief: true, active_questions: 3, cost: { rates: [{ app: "chatgpt", credits_per_answer: 1 }], minimum_per_scan: 10, per_scan: 10, scans_per_month: 31, per_brief: 25, briefs_per_month: 5, monthly_max: 435 } }, created_at: "2026-11-14T00:00:00Z", next_scan: { at: "2026-11-15T13:00:00.000Z", off: null }, url: "https://app.frontmost.ai/projects/12" };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let log = [];

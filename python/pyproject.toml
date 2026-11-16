@@ -1,6 +1,6 @@
 [project]
 name = "frontmost"
-version = "0.2.3"
+version = "0.3.0"
 description = "See when ChatGPT and other AI apps recommend your business, from your own code and agents."
 readme = "README.md"
 license = "MIT"

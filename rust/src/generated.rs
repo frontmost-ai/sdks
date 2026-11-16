@@ -175,6 +175,24 @@ pub struct RunConfig {
     pub cost: RunCost,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Off {
+    Daily,
+    Plan,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct NextScan {
+    /// When the next scheduled scan delivers. Null when none is scheduled
+    pub at: Option<String>,
+    /// Why no scan is scheduled. daily: the project's cadence is off. plan: the plan has no scans now
+    pub off: Option<Off>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Project {
     pub object: String,
@@ -191,6 +209,7 @@ pub struct Project {
     /// Older field. The same as run_config.weekly_brief
     pub weekly_brief: bool,
     pub created_at: Option<String>,
+    pub next_scan: NextScan,
     pub url: String,
 }
 
@@ -631,6 +650,202 @@ pub struct AddedQuestionList {
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScanOverviewProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_scan
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ScanOverview {
+    pub project: ScanOverviewProject,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct QuestionsTabProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_questions
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct QuestionsTab {
+    pub project: QuestionsTabProject,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScanAnswersAnswer {
+    pub id: String,
+}
+
+/// The same fields as the MCP tool get_answers
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScanAnswers {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub scan_id: Option<String>,
+    pub total: i64,
+    pub answers: Vec<ScanAnswersAnswer>,
+    pub next_cursor: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct SourcesTabProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_sources
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SourcesTab {
+    pub project: SourcesTabProject,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct RivalsTabProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_rivals
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RivalsTab {
+    pub project: RivalsTabProject,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ProfilesTabProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_profiles
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ProfilesTab {
+    pub project: ProfilesTabProject,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ReadinessProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_readiness
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Readiness {
+    pub project: ReadinessProject,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct QueriesProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_queries
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Queries {
+    pub project: QueriesProject,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScorecardProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScorecardView {
+    pub key: String,
+    pub name: String,
+}
+
+/// The same fields as the MCP tool get_scorecard
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Scorecard {
+    pub project: ScorecardProject,
+    pub views: Vec<ScorecardView>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScorecardViewsView {
+    pub key: String,
+    pub name: String,
+}
+
+/// The same fields as the MCP tool edit_scorecard_views
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScorecardViews {
+    pub views: Vec<ScorecardViewsView>,
+    pub url: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct BriefProject {
+    pub id: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_brief
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Brief {
+    pub project: BriefProject,
+}
+
+/// The same fields as the MCP tool rate_brief
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct BriefRating {
+    pub brief_id: String,
+    pub message: String,
+}
+
+/// The same fields as the MCP tool share_scan
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScanShare {
+    pub scan_id: String,
+}
+
+/// The same fields as the MCP tool get_leaderboard without industry
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct Leaderboards {
+    pub leaderboards: Vec<serde_json::Map<String, serde_json::Value>>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct LeaderboardLeaderboard {
+    pub industry: String,
+    pub name: String,
+    pub url: String,
+}
+
+/// The same fields as the MCP tool get_leaderboard
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Leaderboard {
+    pub leaderboard: LeaderboardLeaderboard,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct IndustriesIndustrie {
+    /// A six-digit NAICS 2022 code
+    pub code: String,
+    pub title: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct Industries {
+    pub industries: Vec<IndustriesIndustrie>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct ProjectsListParams {
     /// Find projects by name or domain
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -727,6 +942,12 @@ pub struct ProjectsUpdateBody {
     /// Older field. Use run_config.weekly_brief
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub weekly_brief: Option<bool>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ProjectsDeleteParams {
+    /// The project's exact name, to confirm the delete
+    pub confirm_name: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -948,6 +1169,317 @@ pub struct RecommendationsUpdateBody {
     pub status: RecommendationStatus,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScansGetParamsPeriod {
+    Scan,
+    #[serde(rename = "7d")]
+    V7d,
+    Week,
+    #[serde(rename = "4w")]
+    V4w,
+    Month,
+    Quarter,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansGetParams {
+    /// Count one scan, or add up the scans of a period. A week runs Monday to Sunday
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub period: Option<ScansGetParamsPeriod>,
+    /// previous, none, or a scan ID to compare with
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub compare_to: Option<String>,
+    /// Only one AI app, such as chatgpt. Default: every app of the project
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansQuestionsParams {
+    /// Open one question's page: every AI app's answer, its full history, and ChatGPT's web searches
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub question_id: Option<String>,
+    /// true keeps only questions about a place; false keeps the rest
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location: Option<bool>,
+    /// Only one AI app, such as chatgpt. Default: every app of the project
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansAnswersParams {
+    /// Only answers to this question
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub question_id: Option<String>,
+    /// Only one AI app, such as chatgpt. Default: every app of the project
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+    /// true: answers that name you. false: answers that do not
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub named: Option<bool>,
+    /// Only answers that named this rival
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rival_id: Option<String>,
+    /// Only answers with this sentiment about you
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sentiment: Option<Sentiment>,
+    /// Only answers that cite this site, such as reddit.com
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub domain: Option<String>,
+    /// Only answers that cite this exact page. Copy the url from the Sources tab
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub page_url: Option<String>,
+    /// With page_url: the exact answers that a Reach result counted for one page. Copy answers_filter from the Sources tab
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reach_result_id: Option<String>,
+    /// A date like 2026-10-01 (UTC) or an ISO time. Lists the answers of every delivered scan from then through this scan
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub since: Option<String>,
+    /// Answers, 1 to 20. Default 10
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    /// The next_cursor of the answers before
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansSourcesParams {
+    /// Open one cited site's page, like g2.com
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub domain: Option<String>,
+    /// With domain reddit.com: open one subreddit's page
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subreddit: Option<String>,
+    /// A date like 2026-10-01. Counts every delivered scan from then through the scan, in place of the 4 weeks
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub since: Option<String>,
+    /// Up to 50 page URLs, comma-separated, to read again
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub page_urls: Option<String>,
+    /// Only one AI app, such as chatgpt. Default: every app of the project
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Sort {
+    Named,
+    Position,
+    Win,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansRivalsParams {
+    /// Open one rival's page: you against it on every KPI, by AI app, and by topic
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rival_id: Option<String>,
+    /// Default named: most named first
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sort: Option<Sort>,
+    /// Only one AI app, such as chatgpt. Default: every app of the project
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansProfilesParams {
+    /// Only one AI app, such as chatgpt. Default: every app of the project
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansReadinessParams {
+    /// Only one AI app, such as chatgpt. Default: every app of the project
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansQueriesParams {
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScorecardGetParamsPeriod {
+    Day,
+    #[serde(rename = "7d")]
+    V7d,
+    Week,
+    Month,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScorecardGetParams {
+    /// A view's name or key. Default: the first view
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub view: Option<String>,
+    /// day, 7d, week, or month. Default: the view's own period
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub period: Option<ScorecardGetParamsPeriod>,
+    /// Show or hide the rows under each headline. Default: the view's own setting
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub break_down: Option<bool>,
+    /// Only one AI app, such as chatgpt. Default: every app of the project
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScorecardUpdateBodyViewGroupBy {
+    Metric,
+    Business,
+    App,
+    Profile,
+    Topic,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScorecardUpdateBodyViewMetric {
+    Visibility,
+    Position,
+    Sentiment,
+    Win,
+    Sov,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ScorecardUpdateBodyViewPeriod {
+    Day,
+    #[serde(rename = "7d")]
+    V7d,
+    Week,
+    Month,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ScorecardUpdateBodyView {
+    /// Keep a view's key to keep its links. Leave it out for a new view
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub key: Option<String>,
+    pub name: String,
+    pub group_by: ScorecardUpdateBodyViewGroupBy,
+    pub items: serde_json::Value,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metrics: Option<Vec<ScorecardUpdateBodyViewMetric>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub break_down: Option<bool>,
+    pub period: ScorecardUpdateBodyViewPeriod,
+    /// Prior, Change, and % Change under each headline row. Default true
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_rows: Option<bool>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScorecardUpdateBody {
+    /// Every view, in tab order. Read the Scorecard first and send its views back with your change
+    pub views: Vec<ScorecardUpdateBodyView>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct BriefGetParams {
+    /// An earlier Weekly Deep Dive. Default: the latest one
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub brief_id: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct BriefRateBody {
+    /// The brief's ID
+    pub brief_id: String,
+    /// true for useful, false for not useful
+    pub useful: bool,
+    /// What made it useful, or what would make the briefs more useful
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct ScansShareBody {
+    /// 1 to 10 email addresses
+    pub to: Vec<String>,
+    /// Which questions to count. Branded questions name your business
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub questions: Option<QuestionSet>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct LeaderboardsGetParams {
+    /// Rank by one AI app's answers
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub app: Option<String>,
+    /// Rank by one topic's answers
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub topic: Option<String>,
+    /// Rows, 1 to 100. Default 10. Answers take 20 at most
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+    /// Read the answers that name this company
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub company_id: Option<String>,
+    /// With company_id: only answers that name it first
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub first: Option<bool>,
+    /// The next_cursor of the answers before
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub cursor: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct IndustriesSearchParams {
+    /// Plain words or the start of a NAICS code
+    pub q: String,
+}
+
 #[derive(Debug, Clone, Copy)]
 pub struct WorkspaceResource<'a> {
     client: &'a Client,
@@ -1040,6 +1572,24 @@ impl ProjectsResource<'_> {
             )
             .await
     }
+
+    /// Delete a project with its scans, answers, and recommendations. This cannot be undone `DELETE /projects/{id}`
+    pub async fn delete(
+        &self,
+        id: &str,
+        params: ProjectsDeleteParams,
+        options: Option<RequestOptions>,
+    ) -> Result<(), Error> {
+        self.client
+            .request(
+                Method::DELETE,
+                &format!("/projects/{}", encode(id)),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -1061,6 +1611,209 @@ impl ScansResource<'_> {
             to_json(&params),
             options,
         )
+    }
+
+    /// The scan's Overview: KPIs per AI app, trend, rivals, sources, top pages, every question's result, and coverage `GET /projects/{id}/scans/{scan_id}`
+    pub async fn get(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        params: Option<ScansGetParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<ScanOverview, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!("/projects/{}/scans/{}", encode(project_id), encode(scan_id)),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// The Questions tab: each question's result per AI app, the business named first, won or lost, and 12 scans of history `GET /projects/{id}/scans/{scan_id}/questions`
+    pub async fn questions(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        params: Option<ScansQuestionsParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<QuestionsTab, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!(
+                    "/projects/{}/scans/{}/questions",
+                    encode(project_id),
+                    encode(scan_id)
+                ),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// The scan's answers, with the MCP get_answers filters. Get one answer by ID to read its text `GET /projects/{id}/scans/{scan_id}/answers`
+    pub async fn answers(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        params: Option<ScansAnswersParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<ScanAnswers, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!(
+                    "/projects/{}/scans/{}/answers",
+                    encode(project_id),
+                    encode(scan_id)
+                ),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// The Sources tab: pages to get on, pages by Reach, and the most cited sites, over the scan and the 4 weeks before it `GET /projects/{id}/scans/{scan_id}/sources`
+    pub async fn sources(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        params: Option<ScansSourcesParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<SourcesTab, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!(
+                    "/projects/{}/scans/{}/sources",
+                    encode(project_id),
+                    encode(scan_id)
+                ),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// The Rivals tab: every business AI named, with named instead of you, named first, position, share of voice, change, and history `GET /projects/{id}/scans/{scan_id}/rivals`
+    pub async fn rivals(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        params: Option<ScansRivalsParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<RivalsTab, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!(
+                    "/projects/{}/scans/{}/rivals",
+                    encode(project_id),
+                    encode(scan_id)
+                ),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// The Profiles tab: each buyer profile's Visibility, Win Rate, and Share of Voice against the top 5 rivals `GET /projects/{id}/scans/{scan_id}/profiles`
+    pub async fn profiles(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        params: Option<ScansProfilesParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<ProfilesTab, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!(
+                    "/projects/{}/scans/{}/profiles",
+                    encode(project_id),
+                    encode(scan_id)
+                ),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// AI Readiness: whether each AI app can read your website, with the failed checks and what to change `GET /projects/{id}/scans/{scan_id}/readiness`
+    pub async fn readiness(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        params: Option<ScansReadinessParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<Readiness, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!(
+                    "/projects/{}/scans/{}/readiness",
+                    encode(project_id),
+                    encode(scan_id)
+                ),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// The web searches ChatGPT ran while it answered, in the scan's week, and how many of those answers named you `GET /projects/{id}/scans/{scan_id}/queries`
+    pub async fn queries(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        params: Option<ScansQueriesParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<Queries, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!(
+                    "/projects/{}/scans/{}/queries",
+                    encode(project_id),
+                    encode(scan_id)
+                ),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// Email the scan's results with the PDF report to up to 10 people. Replies go to you `POST /projects/{id}/scans/{scan_id}/share`
+    pub async fn share(
+        &self,
+        project_id: &str,
+        scan_id: &str,
+        body: ScansShareBody,
+        options: Option<RequestOptions>,
+    ) -> Result<ScanShare, Error> {
+        self.client
+            .request(
+                Method::POST,
+                &format!(
+                    "/projects/{}/scans/{}/share",
+                    encode(project_id),
+                    encode(scan_id)
+                ),
+                None,
+                Some(to_json(&body)),
+                options,
+            )
+            .await
     }
 }
 
@@ -1342,6 +2095,148 @@ impl ProfilesResource<'_> {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct ScorecardResource<'a> {
+    client: &'a Client,
+}
+
+impl ScorecardResource<'_> {
+    /// The Scorecard: your saved views, and one view as a sheet with a column per period `GET /projects/{id}/scorecard`
+    pub async fn get(
+        &self,
+        project_id: &str,
+        params: Option<ScorecardGetParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<Scorecard, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!("/projects/{}/scorecard", encode(project_id)),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// Save the Scorecard's views. Send every view in tab order. A view left out is deleted `PATCH /projects/{id}/scorecard`
+    pub async fn update(
+        &self,
+        project_id: &str,
+        body: ScorecardUpdateBody,
+        options: Option<RequestOptions>,
+    ) -> Result<ScorecardViews, Error> {
+        self.client
+            .request(
+                Method::PATCH,
+                &format!("/projects/{}/scorecard", encode(project_id)),
+                None,
+                Some(to_json(&body)),
+                options,
+            )
+            .await
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct BriefResource<'a> {
+    client: &'a Client,
+}
+
+impl BriefResource<'_> {
+    /// The latest daily note and Weekly Deep Dive, with its findings and three actions `GET /projects/{id}/brief`
+    pub async fn get(
+        &self,
+        project_id: &str,
+        params: Option<BriefGetParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<Brief, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!("/projects/{}/brief", encode(project_id)),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// Say whether a brief was useful. A new rating replaces the earlier one `POST /projects/{id}/brief/rating`
+    pub async fn rate(
+        &self,
+        project_id: &str,
+        body: BriefRateBody,
+        options: Option<RequestOptions>,
+    ) -> Result<BriefRating, Error> {
+        self.client
+            .request(
+                Method::POST,
+                &format!("/projects/{}/brief/rating", encode(project_id)),
+                None,
+                Some(to_json(&body)),
+                options,
+            )
+            .await
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct LeaderboardsResource<'a> {
+    client: &'a Client,
+}
+
+impl LeaderboardsResource<'_> {
+    /// Frontmost AI's public leaderboards, by industry `GET /leaderboards`
+    pub async fn list(&self, options: Option<RequestOptions>) -> Result<Leaderboards, Error> {
+        self.client
+            .request(Method::GET, "/leaderboards", None, None, options)
+            .await
+    }
+
+    /// Which companies AI apps name most for an industry's buyer questions, from the latest weekly scan `GET /leaderboards/{industry}`
+    pub async fn get(
+        &self,
+        industry: &str,
+        params: Option<LeaderboardsGetParams>,
+        options: Option<RequestOptions>,
+    ) -> Result<Leaderboard, Error> {
+        self.client
+            .request(
+                Method::GET,
+                &format!("/leaderboards/{}", encode(industry)),
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct IndustriesResource<'a> {
+    client: &'a Client,
+}
+
+impl IndustriesResource<'_> {
+    /// Find NAICS industries by plain words, such as dentist, or by code `GET /industries`
+    pub async fn search(
+        &self,
+        params: IndustriesSearchParams,
+        options: Option<RequestOptions>,
+    ) -> Result<Industries, Error> {
+        self.client
+            .request(
+                Method::GET,
+                "/industries",
+                Some(to_json(&params)),
+                None,
+                options,
+            )
+            .await
+    }
+}
+
 impl Client {
     pub fn workspace(&self) -> WorkspaceResource<'_> {
         WorkspaceResource { client: self }
@@ -1381,5 +2276,21 @@ impl Client {
 
     pub fn profiles(&self) -> ProfilesResource<'_> {
         ProfilesResource { client: self }
+    }
+
+    pub fn scorecard(&self) -> ScorecardResource<'_> {
+        ScorecardResource { client: self }
+    }
+
+    pub fn brief(&self) -> BriefResource<'_> {
+        BriefResource { client: self }
+    }
+
+    pub fn leaderboards(&self) -> LeaderboardsResource<'_> {
+        LeaderboardsResource { client: self }
+    }
+
+    pub fn industries(&self) -> IndustriesResource<'_> {
+        IndustriesResource { client: self }
     }
 }
