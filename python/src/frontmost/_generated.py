@@ -244,12 +244,37 @@ class Position(TypedDict):
     previous: Optional[float]
 
 
+class SentimentFigure(TypedDict):
+    """value, numerator, and denominator count statements: positive statements over positive and negative statements. The rate fields count answers"""
+
+    # numerator / denominator, from 0 to 1. Null with no answers
+    value: Optional[float]
+    numerator: int
+    denominator: int
+    # The same rate in the comparison period. Null with no comparison
+    previous: Optional[float]
+    # Percent, 0 to 100, one decimal: positive_answers / analyzed_answers. Null with no analyzed answers
+    positive_rate: Optional[float]
+    # Percent, 0 to 100, one decimal: negative_answers / analyzed_answers. Null with no analyzed answers
+    negative_rate: Optional[float]
+    # Analyzed answers with at least one positive statement about you
+    positive_answers: int
+    # Analyzed answers with at least one negative statement about you. One answer can count here and in positive_answers
+    negative_answers: int
+    # Answers that name you and have a finished sentiment check
+    analyzed_answers: int
+    # positive_rate minus the comparison period's, in percentage points. Null with no comparison
+    positive_rate_change: Optional[float]
+    # negative_rate minus the comparison period's, in percentage points. Null with no comparison
+    negative_rate_change: Optional[float]
+
+
 class Figures(TypedDict):
     visibility: Rate
     win_rate: Rate
     position: Position
-    # Positive statements over classified statements. Null before Sentiment existed
-    sentiment: Optional[Rate]
+    # Null before Sentiment existed
+    sentiment: Optional[SentimentFigure]
 
 
 Period = Literal["scan", "week", "month"]
@@ -293,8 +318,8 @@ class MetricsGroup(TypedDict):
     visibility: Rate
     win_rate: Rate
     position: Position
-    # Positive statements over classified statements. Null before Sentiment existed
-    sentiment: Optional[Rate]
+    # Null before Sentiment existed
+    sentiment: Optional[SentimentFigure]
 
 
 class Metrics(TypedDict):
@@ -2472,6 +2497,7 @@ __all__ = [
     "ProjectSetup",
     "Rate",
     "Position",
+    "SentimentFigure",
     "Figures",
     "Period",
     "QuestionSet",

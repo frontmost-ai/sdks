@@ -207,12 +207,36 @@ export type Position = {
   previous: number | null;
 };
 
+/** value, numerator, and denominator count statements: positive statements over positive and negative statements. The rate fields count answers */
+export type SentimentFigure = {
+  /** numerator / denominator, from 0 to 1. Null with no answers */
+  value: number | null;
+  numerator: number;
+  denominator: number;
+  /** The same rate in the comparison period. Null with no comparison */
+  previous: number | null;
+  /** Percent, 0 to 100, one decimal: positive_answers / analyzed_answers. Null with no analyzed answers */
+  positive_rate: number | null;
+  /** Percent, 0 to 100, one decimal: negative_answers / analyzed_answers. Null with no analyzed answers */
+  negative_rate: number | null;
+  /** Analyzed answers with at least one positive statement about you */
+  positive_answers: number;
+  /** Analyzed answers with at least one negative statement about you. One answer can count here and in positive_answers */
+  negative_answers: number;
+  /** Answers that name you and have a finished sentiment check */
+  analyzed_answers: number;
+  /** positive_rate minus the comparison period's, in percentage points. Null with no comparison */
+  positive_rate_change: number | null;
+  /** negative_rate minus the comparison period's, in percentage points. Null with no comparison */
+  negative_rate_change: number | null;
+};
+
 export type Figures = {
   visibility: Rate;
   win_rate: Rate;
   position: Position;
-  /** Positive statements over classified statements. Null before Sentiment existed */
-  sentiment: Rate | null;
+  /** Null before Sentiment existed */
+  sentiment: SentimentFigure | null;
 };
 
 export type Period = "scan" | "week" | "month";
@@ -249,8 +273,8 @@ export type MetricsGroup = {
   visibility: Rate;
   win_rate: Rate;
   position: Position;
-  /** Positive statements over classified statements. Null before Sentiment existed */
-  sentiment: Rate | null;
+  /** Null before Sentiment existed */
+  sentiment: SentimentFigure | null;
 };
 
 export type Metrics = {

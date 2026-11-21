@@ -307,13 +307,38 @@ pub struct Position {
     pub previous: Option<f64>,
 }
 
+/// value, numerator, and denominator count statements: positive statements over positive and negative statements. The rate fields count answers
+#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+pub struct SentimentFigure {
+    /// numerator / denominator, from 0 to 1. Null with no answers
+    pub value: Option<f64>,
+    pub numerator: i64,
+    pub denominator: i64,
+    /// The same rate in the comparison period. Null with no comparison
+    pub previous: Option<f64>,
+    /// Percent, 0 to 100, one decimal: positive_answers / analyzed_answers. Null with no analyzed answers
+    pub positive_rate: Option<f64>,
+    /// Percent, 0 to 100, one decimal: negative_answers / analyzed_answers. Null with no analyzed answers
+    pub negative_rate: Option<f64>,
+    /// Analyzed answers with at least one positive statement about you
+    pub positive_answers: i64,
+    /// Analyzed answers with at least one negative statement about you. One answer can count here and in positive_answers
+    pub negative_answers: i64,
+    /// Answers that name you and have a finished sentiment check
+    pub analyzed_answers: i64,
+    /// positive_rate minus the comparison period's, in percentage points. Null with no comparison
+    pub positive_rate_change: Option<f64>,
+    /// negative_rate minus the comparison period's, in percentage points. Null with no comparison
+    pub negative_rate_change: Option<f64>,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Figures {
     pub visibility: Rate,
     pub win_rate: Rate,
     pub position: Position,
-    /// Positive statements over classified statements. Null before Sentiment existed
-    pub sentiment: Option<Rate>,
+    /// Null before Sentiment existed
+    pub sentiment: Option<SentimentFigure>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -379,8 +404,8 @@ pub struct MetricsGroup {
     pub visibility: Rate,
     pub win_rate: Rate,
     pub position: Position,
-    /// Positive statements over classified statements. Null before Sentiment existed
-    pub sentiment: Option<Rate>,
+    /// Null before Sentiment existed
+    pub sentiment: Option<SentimentFigure>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
