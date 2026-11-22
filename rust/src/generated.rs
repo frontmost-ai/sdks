@@ -213,6 +213,28 @@ pub struct Project {
     pub url: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Status {
+    Asking,
+    NeedsCredits,
+    NextScan,
+    Answered,
+    /// A value this SDK version does not know yet.
+    #[serde(other)]
+    Unknown,
+}
+
+/// When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct QuestionFirstAnswers {
+    pub status: Status,
+    /// asking: the answers are in by this time. next_scan: the next scan's time, or null when none is set.
+    pub expected_by: Option<String>,
+    /// asking and needs_credits: what the question's new answers cost
+    pub credits: Option<i64>,
+}
+
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct Question {
     pub object: String,
@@ -223,6 +245,8 @@ pub struct Question {
     /// Null while Frontmost AI has not decided whether the question names the brand
     pub is_branded: Option<bool>,
     pub profile_id: Option<String>,
+    /// When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question.
+    pub first_answers: Option<QuestionFirstAnswers>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
@@ -592,6 +616,16 @@ pub struct Profile {
     pub who: String,
 }
 
+/// When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AddedQuestionFirstAnswers {
+    pub status: Status,
+    /// asking: the answers are in by this time. next_scan: the next scan's time, or null when none is set.
+    pub expected_by: Option<String>,
+    /// asking and needs_credits: what the question's new answers cost
+    pub credits: Option<i64>,
+}
+
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct AddedQuestion {
     pub object: String,
@@ -602,6 +636,8 @@ pub struct AddedQuestion {
     /// Null while Frontmost AI has not decided whether the question names the brand
     pub is_branded: Option<bool>,
     pub profile_id: Option<String>,
+    /// When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question.
+    pub first_answers: Option<AddedQuestionFirstAnswers>,
     /// False when the project already had this question
     pub created: bool,
 }

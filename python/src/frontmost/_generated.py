@@ -164,6 +164,16 @@ class Project(TypedDict):
     url: str
 
 
+class QuestionFirstAnswers(TypedDict):
+    """When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question."""
+
+    status: Literal["asking", "needs_credits", "next_scan", "answered"]
+    # asking: the answers are in by this time. next_scan: the next scan's time, or null when none is set.
+    expected_by: Optional[str]
+    # asking and needs_credits: what the question's new answers cost
+    credits: Optional[int]
+
+
 class Question(TypedDict):
     object: Literal["question"]
     id: str
@@ -173,6 +183,8 @@ class Question(TypedDict):
     # Null while Frontmost AI has not decided whether the question names the brand
     is_branded: Optional[bool]
     profile_id: Optional[str]
+    # When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question.
+    first_answers: Optional[QuestionFirstAnswers]
 
 
 class ProjectList(TypedDict):
@@ -463,6 +475,16 @@ class Profile(TypedDict):
     who: str
 
 
+class AddedQuestionFirstAnswers(TypedDict):
+    """When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question."""
+
+    status: Literal["asking", "needs_credits", "next_scan", "answered"]
+    # asking: the answers are in by this time. next_scan: the next scan's time, or null when none is set.
+    expected_by: Optional[str]
+    # asking and needs_credits: what the question's new answers cost
+    credits: Optional[int]
+
+
 class AddedQuestion(TypedDict):
     object: Literal["question"]
     id: str
@@ -472,6 +494,8 @@ class AddedQuestion(TypedDict):
     # Null while Frontmost AI has not decided whether the question names the brand
     is_branded: Optional[bool]
     profile_id: Optional[str]
+    # When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question.
+    first_answers: Optional[AddedQuestionFirstAnswers]
     # False when the project already had this question
     created: bool
 
@@ -2487,6 +2511,7 @@ __all__ = [
     "RunConfig",
     "NextScan",
     "Project",
+    "QuestionFirstAnswers",
     "Question",
     "ProjectList",
     "QuestionList",
@@ -2520,6 +2545,7 @@ __all__ = [
     "RecommendationStatus",
     "Recommendation",
     "Profile",
+    "AddedQuestionFirstAnswers",
     "AddedQuestion",
     "ScanList",
     "RivalList",

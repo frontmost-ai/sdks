@@ -1,7 +1,7 @@
 // Hand-written runtime. The generator never writes this file. It holds what every route shares:
 // the key, retries, timeouts, errors, idempotency keys, and cursor pages.
 
-export const VERSION = "0.4.1";
+export const VERSION = "0.4.2";
 
 export type ClientOptions = {
   /** Default: FRONTMOST_API_KEY. */

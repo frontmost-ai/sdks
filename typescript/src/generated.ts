@@ -144,6 +144,14 @@ export type Question = {
   /** Null while Frontmost AI has not decided whether the question names the brand */
   is_branded: boolean | null;
   profile_id: string | null;
+  /** When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question. */
+  first_answers: {
+    status: "asking" | "needs_credits" | "next_scan" | "answered";
+    /** asking: the answers are in by this time. next_scan: the next scan's time, or null when none is set. */
+    expected_by: string | null;
+    /** asking and needs_credits: what the question's new answers cost */
+    credits: number | null;
+  } | null;
 };
 
 export type ProjectList = {
@@ -401,6 +409,14 @@ export type AddedQuestion = {
   /** Null while Frontmost AI has not decided whether the question names the brand */
   is_branded: boolean | null;
   profile_id: string | null;
+  /** When the question's first answers come. A question added after today's scan is asked in that scan. Null for a paused question. */
+  first_answers: {
+    status: "asking" | "needs_credits" | "next_scan" | "answered";
+    /** asking: the answers are in by this time. next_scan: the next scan's time, or null when none is set. */
+    expected_by: string | null;
+    /** asking and needs_credits: what the question's new answers cost */
+    credits: number | null;
+  } | null;
   /** False when the project already had this question */
   created: boolean;
 };
